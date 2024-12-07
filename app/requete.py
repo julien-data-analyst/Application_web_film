@@ -9,6 +9,7 @@ from sqlalchemy.sql import insert, func # Les fonctions utilisées pour gérer l
 from config import app
 import os 
 import datetime
+
 # Attention : se placer dans le dossier app pour tester le programme
 # Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
 
@@ -25,18 +26,27 @@ with app.app_context():
     # Ajout d'instances
     new_genre = Genre(genre="drama")
     new_genre_2 = Genre(genre="action")
-    new_film = Film(title="Film", vote_count=0, 
+    new_film = Film(title="Film", vote_count=15000,
+                    vote_average = 10,
+                    popularity = 0.5, 
                     release_date=datetime.datetime.now(),
+                    runtime = 60,
                     budget = 200,
                     revenue = 100)
-    new_film_2 = Film(title="Mastermind", vote_count=0, 
+    
+    new_film_2 = Film(title="Mastermind", vote_count=10000,
+                      vote_average=20, 
                       release_date = datetime.datetime.now(),
                       budget = 70,
+                      runtime = 120,
+                      popularity= 0.7,
                       revenue = 100)
     new_film_3 = Film(title="Popularity", 
                       vote_count=0,
                       budget = 10,
-                      revenue = 100)
+                      revenue = 100,
+                      popularity = 0.8,
+                      runtime = 50)
     new_film_4 = Film(title="Popularity", vote_count=0, 
                       release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"),
                       budget = 20,
@@ -248,7 +258,7 @@ with app.app_context():
     print("Les dix films les plus rentables : \n"+str(result_f_plus_rent)+"\n") # Les instances des films + le ratio recette/budget >= 1
 
     # Les plus décifitaires (recettes - budget)
-    result_d_plus_def = (
+    result_f_plus_def = (
         Film.query
         .add_columns(deficit) # Calcul du déficit
         .order_by(deficit) # ordre croissant
@@ -256,23 +266,69 @@ with app.app_context():
         .limit(10) # Limiter aux dix premiers films déficitaires
         .all()
     )
-    print("Les dix films les plus déficitaires : \n"+str(result_d_plus_def)+"\n") # Les instances des films + le déficit
+    print("Les dix films les plus déficitaires : \n"+str(result_f_plus_def)+"\n") # Les instances des films + le déficit
     ###################################################
     ###################################################
 
     ####################################################
     # SECTION 3 : Statistiques sur les votes
     ####################################################
+    # Les dix films les mieux notés (vote_average)
+    result_f_n = (
+        Film.query
+        .order_by(Film.vote_average.desc())
+        .filter(Film.vote_average != None)
+        .limit(10)
+        .all()
+    )
+    print("Les dix films les mieux notés : "+ str(result_f_n)) # Instances de films
 
-    
+    # Les dix films les plus votés (vote_count)
+    result_f_c = (
+        Film.query
+        .order_by(Film.vote_count.desc())
+        .filter(Film.vote_count > 0)
+        .limit(10)
+        .all()
+    )
+    print("Les dix films les plus votés : "+ str(result_f_c)) # Instances de films
+
+    # Les dix films les plus populaires (popularity)
+    result_f_p = (
+        Film.query
+        .order_by(Film.popularity.desc())
+        .filter(Film.popularity != None)
+        .limit(10)
+        .all()
+    )
+    print("Les dix films les plus populaires : "+ str(result_f_p)) # Instances de films
+
     ####################################################
     ####################################################
 
     ####################################################
     # SECTION 4 : Statistiques sur les durées
     ####################################################
+    # Les dix films les plus longs
+    result_f_plus_long = (
+        Film.query
+        .order_by(Film.runtime.desc())
+        .filter(Film.runtime != None)
+        .limit(10)
+        .all()
+    )
+    print("Les dix films les plus longues : "+ str(result_f_plus_long)) # Instances de films
 
-    
+    # Les dix films les plus courts
+    result_f_plus_court = (
+        Film.query
+        .order_by(Film.runtime)
+        .filter(Film.runtime != None)
+        .limit(10)
+        .all()
+    )
+    print("Les dix films les plus courtes : "+ str(result_f_plus_court)) # Instances de films
+
     ####################################################
     ####################################################
 
