@@ -25,11 +25,27 @@ with app.app_context():
     # Ajout d'instances
     new_genre = Genre(genre="drama")
     new_genre_2 = Genre(genre="action")
-    new_film = Film(title="Film", vote_count=0, release_date=datetime.datetime.now())
-    new_film_2 = Film(title="Mastermind", vote_count=0, release_date = datetime.datetime.now())
-    new_film_3 = Film(title="Popularity", vote_count=0)
-    new_film_4 = Film(title="Popularity", vote_count=0, release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"))
-    new_film_5 = Film(title="Popularity", vote_count=0, release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"))
+    new_film = Film(title="Film", vote_count=0, 
+                    release_date=datetime.datetime.now(),
+                    budget = 200,
+                    revenue = 100)
+    new_film_2 = Film(title="Mastermind", vote_count=0, 
+                      release_date = datetime.datetime.now(),
+                      budget = 70,
+                      revenue = 100)
+    new_film_3 = Film(title="Popularity", 
+                      vote_count=0,
+                      budget = 10,
+                      revenue = 100)
+    new_film_4 = Film(title="Popularity", vote_count=0, 
+                      release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"),
+                      budget = 20,
+                      revenue = 10)
+    new_film_5 = Film(title="Popularity", 
+                      vote_count=0, 
+                      release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"),
+                      budget = 50,
+                      revenue = 80)
     new_film_6 = Film(title="Popularity", vote_count=0, release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"))
     new_langage = Langage(langage="French")
     new_langage_2 = Langage(langage="Allemand")
@@ -129,7 +145,7 @@ with app.app_context():
             .all()
     )
 
-    #print(result_f_par_g)
+    print("Le nombre de films par genre : \n"+str(result_f_par_g) + "\n")
     ############################
     ############################
 
@@ -145,7 +161,7 @@ with app.app_context():
             .limit(20) # Limiter à 20 langues
             .all() # Récupération de toutes les 20 lignes
     )
-    print(result_f_par_l)
+    print("Le nombre de films par langue : \n"+str(result_f_par_l) + "\n")
     ##########################
     ##########################
 
@@ -160,7 +176,7 @@ with app.app_context():
         .limit(20)
         .all()
     )
-    print(result_f_par_a)
+    print("Le nombre de films par année : \n"+str(result_f_par_a) + "\n")
     ###########################
     ###########################
 
@@ -168,19 +184,20 @@ with app.app_context():
     # Chercher le genre le plus associé au film + l'année la plus productive
     ###########################
     max_genre = result_f_par_l[0]
-    print(max_genre) # Le premier de notre première requête
+    print("Le genre qui apparaît le plus : " + str(max_genre[0])) # Le premier de notre première requête
 
     # Requête pour trouver l'année la plus productive
     result_max_ann = (
-        Film.query.group_by(Film.release_date)
+        Film.query
+        .group_by(Film.release_date)
         .add_columns(date_year,
                     cpt_film) # 2ème et 3ème colonne (Année et total)
         .order_by(cpt_film.desc())
         .limit(1)
         .all()
     )
-    max_annee = result_max_ann[0]
-    print(max_annee) # L'année la plus productive
+    max_annee = result_max_ann[0][1]
+    print("L'année la plus productive : " + str(max_annee)) # L'année la plus productive
     ###########################
     ###########################
 
@@ -188,9 +205,60 @@ with app.app_context():
     # SECTION 2 : Statistiques financières
     ####################################################
 
+    # Définition des variables calculées
+    somme_budget = func.sum(Film.budget)
+    somme_revenue = func.sum(Film.revenue)
+    ratio = Film.revenue / Film.budget
+    deficit = Film.revenue - Film.budget
 
     ####################################################
+    # Total des recettes et budgets cumulés ############
     ####################################################
+    total_budget_recette = (Film.query
+                            .add_columns(somme_budget, somme_revenue)
+                            .first()
+                            )
+    print("Le total des budgets et des recettes cumulés : \n"+str(total_budget_recette)+"\n")
+    ###################################################
+    ###################################################
+
+    ####################################################
+    # Liste des dix films ############
+    ####################################################
+
+    # Les plus chères ##################
+    result_f_plus_cher = (
+                        Film.query
+                        .order_by(Film.budget.desc()) # Dans l'ordre décroissant
+                        .filter(Film.budget != None) # Si le budget vide
+                        .limit(10) # Limiter aux dix premières
+                        .all()
+                            )
+    print("Les dix films les plus chères : \n"+str(result_f_plus_cher)+"\n") # Les instances des films
+
+    # Les plus rentables (ratio recettes/budget)
+    result_f_plus_rent = (
+                        Film.query
+                        .add_columns(ratio) # Calcul de ratio
+                        .order_by(-ratio) # ordre décroissant
+                        .filter(ratio>=1) # Si le ratio est rentable >1
+                        .limit(10) # Limiter aux dix pemiers films rentables
+                        .all()
+    )
+    print("Les dix films les plus rentables : \n"+str(result_f_plus_rent)+"\n") # Les instances des films + le ratio recette/budget >= 1
+
+    # Les plus décifitaires (recettes - budget)
+    result_d_plus_def = (
+        Film.query
+        .add_columns(deficit) # Calcul du déficit
+        .order_by(deficit) # ordre croissant
+        .filter(deficit <= 0) # si le déficit n'est pas vide et qu'il est négatif
+        .limit(10) # Limiter aux dix premiers films déficitaires
+        .all()
+    )
+    print("Les dix films les plus déficitaires : \n"+str(result_d_plus_def)+"\n") # Les instances des films + le déficit
+    ###################################################
+    ###################################################
 
     ####################################################
     # SECTION 3 : Statistiques sur les votes
