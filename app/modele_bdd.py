@@ -57,6 +57,11 @@ class Film(db.Model):
                              backref='films',
                              lazy="dynamic")
     
+    langages = db.relationship('Langage',
+                             secondary="film_langages",
+                             backref='films',
+                             lazy="dynamic")
+    
 ##############################
 # ---- Pour la table Directeur ----
 ##############################
