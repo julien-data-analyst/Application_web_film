@@ -216,9 +216,8 @@ with app.app_context():
     # Nombre de films par année (20 dernières années)
     ###########################
     result_f_par_a = (
-        Film.query.group_by(Film.release_date)
-        .add_columns(date_year,
-                    cpt_film) # 2ème et 3ème colonne (Année et total)
+        db.session.query(date_year, cpt_film).group_by(date_year)
+        .filter(date_year != None)
         .order_by(date_year.desc())
         .limit(20)
         .all()
