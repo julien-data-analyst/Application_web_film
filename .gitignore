@@ -2,3 +2,6 @@
 envSAEOutil/
 Observation.ipynb
 nettoyage_preparation/
+app/templates/import_chartjs.html
+app/requete.py
+Schema_BDD_DCU.drawio

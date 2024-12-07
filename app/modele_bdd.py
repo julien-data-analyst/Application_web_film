@@ -44,15 +44,18 @@ class Film(db.Model):
     # Création des relations étrangères (*-*)
     genres = db.relationship('Genre',
                              secondary="film_genres",
-                             backref='films')
+                             backref='films',
+                             lazy = "dynamic")
 
     companies = db.relationship('Companie',
                              secondary="film_companies",
-                             backref='films')
+                             backref='films',
+                             lazy = 'dynamic')
     
     acteurs = db.relationship('Acteur',
                              secondary="film_acteurs",
-                             backref='films')
+                             backref='films',
+                             lazy="dynamic")
     
 ##############################
 # ---- Pour la table Directeur ----
@@ -67,8 +70,8 @@ class Directeur(db.Model):
     prenom = db.Column(db.String(70), nullable=False)
 
     # Création de la relation avec la clé étrangère (1-*)
-    films = db.relationship('Film', backref = 'film',
-    lazy = 'dynamic')
+    films = db.relationship('Film', backref = 'directeur',
+    lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
 # ---- Pour la table Genre ----
@@ -93,8 +96,8 @@ class Collection(db.Model):
     name = db.Column(db.String(90), nullable=False)
 
     # Création de la relation avec la clé étrangère (1-*)
-    films = db.relationship('Film', backref = 'film',
-    lazy = 'dynamic')
+    films = db.relationship('Film', backref = 'collection',
+    lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
 # ---- Pour la table Acteur ----
