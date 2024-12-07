@@ -159,7 +159,7 @@ film_companies = db.Table(
 )
 
 # Pour Film et Acteur
-film_companies = db.Table(
+film_acteurs = db.Table(
     'film_acteurs',
 
     db.Column('id_film', db.Integer,
@@ -170,7 +170,7 @@ film_companies = db.Table(
 )
 
 # Pour Film et Langage
-film_companies = db.Table(
+film_langages = db.Table(
     'film_langages',
 
     db.Column('id_film', db.Integer,

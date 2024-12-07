@@ -6,6 +6,7 @@
 
 # Chargement des librairies 
 from flask import Flask
+import secrets
 
 # Lancement de l'application (pour le moment que la BDD)
 app = Flask(__name__)
@@ -14,3 +15,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///films.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
+# ---- Configuration de la clé secrète
+app.secret_key = secrets.token_hex(16) # aléatoire
