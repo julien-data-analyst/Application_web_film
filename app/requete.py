@@ -16,6 +16,43 @@ import datetime
 # ---- Test provisoire sur la création du BDD ----
 db.init_app(app)
 
+# ---- Création d'une fct utilitaire pour les informations de Film ----
+def inf_film(col, cond, order_by="", calcule=False, limit=10):
+    """
+    Fonction : Récupérer des informations numériques (top 10) sur les Films (runtime, vote_count, budget, etc)
+    Arguments :
+    - col : colonne en question (objet Film) 
+    - cond : condition à utiliser dans la requête (expression booléenne)
+    - calcule : valeur booléenne s'il est calculé ou non (par défaut : False)
+    - order_by : ordre croissant / décroissant (par défaut : croissant)
+    - limit : nombre d'enregistrements à récupérer (par défaut : 10)
+    Retour : 
+    Résultat de la requête SQL (liste d'instance/de tuples)
+    """
+
+    if order_by=="" :
+        order_by = col
+    
+    if calcule :
+        result = (
+                Film.query
+                .add_columns(col)
+                .order_by(order_by)
+                .filter(cond)
+                .limit(limit)
+                .all()
+        )
+    else:
+        result = (
+                Film.query
+                .order_by(order_by)
+                .filter(cond)
+                .limit(limit)
+                .all()
+        )
+    
+    return result
+
 # ---- Préparation des différentes requêtes SQL ----
 # cmd.produits.extend(prod_sel) # Ajout des produits sélecitonnées (liste des classes)
 with app.app_context():
@@ -237,35 +274,15 @@ with app.app_context():
     ####################################################
 
     # Les plus chères ##################
-    result_f_plus_cher = (
-                        Film.query
-                        .order_by(Film.budget.desc()) # Dans l'ordre décroissant
-                        .filter(Film.budget != None) # Si le budget vide
-                        .limit(10) # Limiter aux dix premières
-                        .all()
-                            )
+    result_f_plus_cher = inf_film(col=Film.budget, cond=Film.budget != None, order_by=Film.budget.desc())
     print("Les dix films les plus chères : \n"+str(result_f_plus_cher)+"\n") # Les instances des films
 
     # Les plus rentables (ratio recettes/budget)
-    result_f_plus_rent = (
-                        Film.query
-                        .add_columns(ratio) # Calcul de ratio
-                        .order_by(-ratio) # ordre décroissant
-                        .filter(ratio>=1) # Si le ratio est rentable >1
-                        .limit(10) # Limiter aux dix pemiers films rentables
-                        .all()
-    )
+    result_f_plus_rent = inf_film(col=ratio, cond=ratio>=1, order_by=-ratio, calcule=True)
     print("Les dix films les plus rentables : \n"+str(result_f_plus_rent)+"\n") # Les instances des films + le ratio recette/budget >= 1
 
     # Les plus décifitaires (recettes - budget)
-    result_f_plus_def = (
-        Film.query
-        .add_columns(deficit) # Calcul du déficit
-        .order_by(deficit) # ordre croissant
-        .filter(deficit <= 0) # si le déficit n'est pas vide et qu'il est négatif
-        .limit(10) # Limiter aux dix premiers films déficitaires
-        .all()
-    )
+    result_f_plus_def = inf_film(col=deficit, cond=deficit <= 0, calcule=True)
     print("Les dix films les plus déficitaires : \n"+str(result_f_plus_def)+"\n") # Les instances des films + le déficit
     ###################################################
     ###################################################
@@ -274,33 +291,18 @@ with app.app_context():
     # SECTION 3 : Statistiques sur les votes
     ####################################################
     # Les dix films les mieux notés (vote_average)
-    result_f_n = (
-        Film.query
-        .order_by(Film.vote_average.desc())
-        .filter(Film.vote_average != None)
-        .limit(10)
-        .all()
-    )
+    result_f_n = inf_film(col=Film.vote_average, cond=Film.vote_average != None, 
+                          order_by=Film.vote_average.desc())
     print("Les dix films les mieux notés : "+ str(result_f_n)) # Instances de films
 
     # Les dix films les plus votés (vote_count)
-    result_f_c = (
-        Film.query
-        .order_by(Film.vote_count.desc())
-        .filter(Film.vote_count > 0)
-        .limit(10)
-        .all()
-    )
+    result_f_c = inf_film(col=Film.vote_count, cond=Film.vote_count > 0, 
+                          order_by=Film.vote_count.desc())
     print("Les dix films les plus votés : "+ str(result_f_c)) # Instances de films
 
     # Les dix films les plus populaires (popularity)
-    result_f_p = (
-        Film.query
-        .order_by(Film.popularity.desc())
-        .filter(Film.popularity != None)
-        .limit(10)
-        .all()
-    )
+    result_f_p =  inf_film(col=Film.popularity, cond=Film.popularity != None, 
+                          order_by=Film.popularity.desc())
     print("Les dix films les plus populaires : "+ str(result_f_p)) # Instances de films
 
     ####################################################
@@ -310,23 +312,13 @@ with app.app_context():
     # SECTION 4 : Statistiques sur les durées
     ####################################################
     # Les dix films les plus longs
-    result_f_plus_long = (
-        Film.query
-        .order_by(Film.runtime.desc())
-        .filter(Film.runtime != None)
-        .limit(10)
-        .all()
-    )
+    result_f_plus_long = inf_film(col=Film.runtime, cond=Film.runtime != None, 
+                          order_by=Film.runtime.desc())
     print("Les dix films les plus longues : "+ str(result_f_plus_long)) # Instances de films
 
     # Les dix films les plus courts
-    result_f_plus_court = (
-        Film.query
-        .order_by(Film.runtime)
-        .filter(Film.runtime != None)
-        .limit(10)
-        .all()
-    )
+    result_f_plus_court = inf_film(col=Film.runtime, cond=Film.runtime != None, 
+                          order_by=Film.runtime)
     print("Les dix films les plus courtes : "+ str(result_f_plus_court)) # Instances de films
 
     ####################################################
