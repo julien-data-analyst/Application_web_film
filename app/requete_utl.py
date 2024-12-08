@@ -8,16 +8,13 @@
 from modele_bdd import db, Genre, Film, Directeur, Langage, film_langages, film_genres # Toutes les tables et relations
 from sqlalchemy.sql import insert, func # Les fonctions utilisées pour gérer les group_by et les aggrégations
 from sqlalchemy.sql.expression import ColumnElement
-
 from config import app
-import os 
-import datetime
 
 # ---- Test provisoire sur la création du BDD ----
 db.init_app(app)
 
 # ---- Création de plusieurs fct utilitaires pour les informations de Film et la mise en forme des résultats ----
-def inf_film(col, cond, order_by="", calcule=False, limit=10):
+def inf_film_10(col, cond, order_by="", calcule=False, limit=10):
     """
     Fonction : Récupérer des informations numériques (top 10) sur les Films (runtime, vote_count, budget, etc)
     Arguments :
@@ -140,7 +137,6 @@ def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter
     if not(isinstance(order_by, ColumnElement)) : # Si ce n'est pas une instance de colonne élément
         order_by = -col_cal
 
-    print(order_by)
     query_sql = (
                  query_sql
                  .group_by(group_by)
@@ -163,3 +159,220 @@ def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter
 ####################################################
 # SECTION 1 : Répartition des films selon différents critères
 ####################################################
+
+###########################
+# Nombre de films par genre 
+###########################
+def films_par_genre():
+    """
+    Fonction : requête SQL pour récupérer le nombre de films par genre avec mise en forme des résultats
+    Retour : Dictionnaire de liste ({"mod" : [...], "eff" : [...]})
+    """
+
+    # Application de la requête SQL
+    result_f_par_g = req_joint_par_crit(Genre, # Table en question 
+                                        Genre.genre, # Colonne concernée
+                                       film_genres, # Table d'association
+                                       film_genres.c.id_genres) # Colonne de la table d'association
+    
+    # Mise en forme des résultats
+    result_f_par_g = mise_forme_resultats_graph(result_f_par_g)
+
+    return result_f_par_g
+
+
+###########################
+# Nombre de films par langue (20 premiers) 
+########################### 
+def films_par_langue():
+    """
+    Fonction : requête SQL pour récupérer le nombre de films par langue avec mise en forme des résultats
+    Retour : Dictionnaire de liste ({"mod" : [...], "eff" : [...]})
+    """
+
+    # Application de la requête SQL
+    result_f_par_l = req_joint_par_crit(
+        Langage, Langage.langage, 
+        film_langages, film_langages.c.id_langage,
+        limit=20
+    )
+
+    # Application de la mise en forme
+    result_f_par_l = mise_forme_resultats_graph(
+        result_f_par_l
+    )
+
+    return result_f_par_l
+
+    ###########################
+    # Nombre de films par année (20 dernières années)
+    ###########################
+def films_par_annee():
+
+    # Création de la variable d'année
+    date_year = func.extract("year", Film.release_date)
+
+    # Application de la requête SQL
+    result_f_par_a = req_joint_par_crit(
+        Film, date_year, False, "",
+        group_by=date_year,
+        order_by=-date_year,
+        add_filter=True,
+        filter=date_year != None,
+        limit=20
+    )
+    
+    # Mise en forme des résultats sous dictionnaire
+    result_f_par_a = mise_forme_resultats_graph(result_f_par_a)
+
+    return result_f_par_a
+
+def annee_plus_productive():
+    # Création de la variable d'année
+    date_year = func.extract("year", Film.release_date)
+
+    # Requête pour trouver l'année la plus productive
+    result_max_ann = req_joint_par_crit(
+        Film, date_year, False, "",
+        group_by=date_year,
+        add_filter=True,
+        filter=date_year != None,
+        limit=1
+    )
+
+    return result_max_ann[0]
+
+####################################################
+# SECTION 2 : Statistiques financières
+####################################################
+
+####################################################
+# Total des recettes et budgets cumulés ############
+####################################################
+def total_budget_recette():
+
+    # Création des colonnes calculées
+    somme_budget = func.sum(Film.budget)
+    somme_revenue = func.sum(Film.revenue)
+
+    total_budget_recette = (Film.query
+                            .add_columns(somme_budget, somme_revenue)
+                            .first()[1:]
+                            )
+    
+    return total_budget_recette
+
+####################################################
+# Liste des dix films les plus chères ############
+####################################################
+def top_10_plus_cher():
+
+    # Application de la requête SQL
+    result_f_plus_cher = inf_film_10(col=Film.budget, cond=Film.budget != None, order_by=Film.budget.desc())
+    
+    return result_f_plus_cher
+
+####################################################
+# Liste des dix films les plus rentables ############
+####################################################
+def top_10_plus_rentables():
+
+    # Création de la colonne calculée
+    ratio = Film.revenue / Film.budget
+
+    # Application de la requête SQL
+    result_f_plus_rent = inf_film_10(col=ratio, cond=ratio>=1, order_by=-ratio, calcule=True)
+
+    return result_f_plus_rent
+
+####################################################
+# Liste des dix films les plus déficitaire ############
+####################################################
+def top_10_plus_deficit():
+
+    # Création de la colonne calculée
+    deficit = Film.revenue - Film.budget
+
+    # Application de la requete SQL
+    result_f_plus_def = inf_film_10(col=deficit, cond=deficit <= 0, calcule=True)
+
+    return result_f_plus_def
+
+
+####################################################
+# SECTION 3 : Statistiques sur les votes
+####################################################
+
+# Les dix films les mieux notés (vote_average)
+def top_10_mieux_notes():
+
+    # Application de la requête SQL
+    result_f_n = inf_film_10(col=Film.vote_average, cond=Film.vote_average != None, 
+                          order_by=Film.vote_average.desc())
+
+    return result_f_n
+
+# Les dix films les plus votés (vote_count)
+def top_10_plus_votes():
+
+    # Application de la requête SQL
+    result_f_c = inf_film_10(col=Film.vote_count, cond=Film.vote_count > 0, 
+                          order_by=Film.vote_count.desc())
+    
+    return result_f_c
+
+# Les dix films les plus populaires (popularity)
+def top_10_plus_populaires():
+    
+    # Application de la requête SQL
+    result_f_p =  inf_film_10(col=Film.popularity, cond=Film.popularity != None, 
+                          order_by=Film.popularity.desc())
+    
+    return result_f_p
+
+####################################################
+# SECTION 4 : Statistiques sur les durées
+####################################################
+
+# Les dix films les plus longues
+def top_10_plus_long():
+
+    # Application de la requête SQL
+    result_f_plus_long = inf_film_10(col=Film.runtime, cond=Film.runtime != None, 
+                          order_by=Film.runtime.desc())
+    
+    return result_f_plus_long
+
+# Les dix films les plus courtes
+def top_10_plus_court():
+
+    # Application de la requête SQL
+    result_f_plus_court = inf_film_10(col=Film.runtime, cond=Film.runtime != None, 
+                          order_by=Film.runtime)
+    
+    return result_f_plus_court
+
+with app.app_context() :
+
+    # Test pour la première section
+    print("Le nombre de films par genre : \n"+str(films_par_genre()) + "\n")
+    print("Le nombre de films par langue : \n"+str(films_par_langue()) + "\n")
+    print("Le nombre de films par année : \n"+str(films_par_annee()) + "\n")
+    max_genre = (films_par_genre()["mod"][0], films_par_genre()["eff"][0])
+    print("Le genre qui apparaît le plus : " + str(max_genre)) # Le premier de notre première requête
+    print("L'année la plus productive : " + str(annee_plus_productive())) # L'année la plus productive
+
+    # Test pour la deuixème section
+    print("Le total des budgets et des recettes cumulés : \n"+str(total_budget_recette())+"\n")
+    print("Les dix films les plus chères : \n"+str(top_10_plus_cher())+"\n") # Les instances des films
+    print("Les dix films les plus rentables : \n"+str(top_10_plus_rentables())+"\n") # Les instances des films
+    print("Les dix films les plus déficitaires : \n"+str(top_10_plus_deficit())+"\n") # Les instances des films
+
+    # Test pour la troisième section
+    print("Les dix films les mieux notés : "+ str(top_10_mieux_notes())) # Instances de films
+    print("Les dix films les plus votés : "+ str(top_10_plus_votes())) # Instances de films
+    print("Les dix films les plus populaires : "+ str(top_10_plus_populaires())) # Instances de films
+
+    # Test pour la quatrième section
+    print("Les dix films les plus longues : "+ str(top_10_plus_long())) # Instances de films
+    print("Les dix films les plus courtes : "+ str(top_10_plus_court())) # Instances de films
