@@ -1,11 +1,12 @@
 #################################################
 # Auteurs : Julien RENOULT - Yop JUGUL DALYOP - Gabriel DURAND - Ryan DOBIGNY
-# Date : 03/12/2024
+# Date : 03/12/2024 - 08/12/2024
 # Sujet : requête SQL pour les visualisations graphiques + indicateurs 
 #################################################
 
 from modele_bdd import db, Genre, Film, Directeur, Langage, film_langages, film_genres # Toutes les tables et relations
 from sqlalchemy.sql import insert, func # Les fonctions utilisées pour gérer les group_by et les aggrégations
+from sqlalchemy.sql.expression import ColumnElement
 from config import app
 import os 
 import datetime
@@ -52,6 +53,80 @@ def inf_film(col, cond, order_by="", calcule=False, limit=10):
         )
     
     return result
+
+def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter=None, group_by=None,
+                       limit=0, col_film=None, col_cal=None, order_by=None):
+    """
+     Fonction : Permet de faire les différentes requêtes SQL nécessaires au visuels graphiques et indicateurs dans la table films et
+     ses tables associatifs
+     
+     Arguments :
+     - table : la table en question avec la relation * à * avec le Film
+     - col : la colonne pour le résultat
+     - jointure : la table d'association entre les deux tables (table d'association : db.Table)
+     si jointure est égale à False, alors il n'y a pas de jointure à faire (colonne existante dans film)
+     - col_table : la colonne pour joindre la table d'association 
+     - filter : La condition de filtrage ave la méthode filter (par défaut : rien)
+     - group_by : la colonne de groupage (par défaut : col)
+     - order_by : colonne pour l'ordre croissante ou décroissante (par défaut : -col_cal)
+     - limit : le nombre d'observations limitées (par défaut : 0, on prend toutes les observations)
+     - col_film : la colonne pour joindre le film (par défaut : jointure.c.id_film)
+     - col_cal : colonne calculée (utilisation de la fonction "func" de SQLAlchemy) (par défaut : func.count(col))
+     - add_filter : valeur booléenne disant si on doit ajouter un filtre à notre requête SQL
+     - filter : filtrage SQL à faire
+     ça peut concerner aussi une colonne numérique dans la table Film.
+
+     
+     Retour :
+     Résultat de la requête SQL (Liste de tuples ou d'un tuple selon la limit)
+
+    """
+    # Utilisation de la fonction count par défaut
+    if col_cal == None :
+          col_cal = func.count(col)
+
+    # Création du début de la requête
+    query_sql = db.session.query(col, col_cal)
+
+    # Vérifions la présence de jointure
+    if jointure != False:
+        if col_film == None:
+         col_film = jointure.c.id_film
+         query_sql = (
+             query_sql
+             .join(jointure, table.id == col_table) # Jointure avec la table d'association
+             .join(Film, Film.id == col_film)
+             )
+
+    # Faisons le filter (pas obligatoire)
+    if add_filter :
+        query_sql = (
+            query_sql
+            .filter(filter)
+        )
+
+    # Faisons le group_by + order_by
+    if not(isinstance(group_by, ColumnElement)) : # Si ce n'est pas une instance de colonne élément
+        group_by = col
+    
+    if not(isinstance(order_by, ColumnElement)) : # Si ce n'est pas une instance de colonne élément
+        order_by = -col_cal
+
+
+    query_sql = (
+                 query_sql
+                 .group_by(group_by)
+                 .order_by(order_by)
+                 )
+    
+    # Faisons le cas de limit
+    if limit > 0 :
+        query_sql = (
+            query_sql
+            .limit(limit)
+        )
+    
+    return query_sql.all()
 
 # ---- Préparation des différentes requêtes SQL ----
 # cmd.produits.extend(prod_sel) # Ajout des produits sélecitonnées (liste des classes)
@@ -109,7 +184,7 @@ with app.app_context():
                         new_film_4, new_film_5, new_film_6])
     db.session.commit()
 
-    # Ajout du lien entre Film et langage (obligée car on ne peut pas rajouter d'attributs)
+    # Ajout du lien entre Film et langage (obligée car on ne peut pas rajouter d'attributs avec extend)
     db.session.execute(
     insert(film_langages).values(
         id_film=new_film.id,
@@ -183,14 +258,9 @@ with app.app_context():
     ###########################
     # Nombre de films par genre 
     ###########################
-    result_f_par_g = (
-            db.session.query(Genre.genre, cpt_film) # Sélection des colonnes
-            .join(film_genres, Genre.id == film_genres.c.id_genres)  # Utilisation de la table d'association
-            .join(Film, Film.id == film_genres.c.id_film)  # Jointure avec Film
-            .group_by(Genre.genre)
-            .order_by(cpt_film.desc())
-            .all()
-    )
+    result_f_par_g = req_joint_par_crit(Genre, Genre.genre,  
+                                       film_genres,
+                                       film_genres.c.id_genres)
 
     print("Le nombre de films par genre : \n"+str(result_f_par_g) + "\n")
     ############################
@@ -199,15 +269,12 @@ with app.app_context():
     ###########################
     # Nombre de films par langue (20 premiers) 
     ########################### 
-    result_f_par_l = (
-        db.session.query(Langage.langage, cpt_film) # Sélection des colonnes + colonne calculée
-            .join(film_langages, Langage.id == film_langages.c.id_langage)  # Utilisation de la table d'association
-            .join(Film, Film.id == film_langages.c.id_film)  # Jointure avec Film
-            .group_by(Langage.langage) # grouper par langage
-            .order_by(cpt_film.desc()) # ordonner par le nombre de films
-            .limit(20) # Limiter à 20 langues
-            .all() # Récupération de toutes les 20 lignes
+    result_f_par_l = req_joint_par_crit(
+        Langage, Langage.langage, 
+        film_langages, film_langages.c.id_langage,
+        limit=20
     )
+
     print("Le nombre de films par langue : \n"+str(result_f_par_l) + "\n")
     ##########################
     ##########################
@@ -215,13 +282,15 @@ with app.app_context():
     ###########################
     # Nombre de films par année (20 dernières années)
     ###########################
-    result_f_par_a = (
-        db.session.query(date_year, cpt_film).group_by(date_year)
-        .filter(date_year != None)
-        .order_by(date_year.desc())
-        .limit(20)
-        .all()
+    result_f_par_a = req_joint_par_crit(
+        Film, date_year, False, "",
+        group_by=date_year,
+        order_by=-date_year,
+        add_filter=True,
+        filter=date_year != None,
+        limit=20
     )
+    
     print("Le nombre de films par année : \n"+str(result_f_par_a) + "\n")
     ###########################
     ###########################
@@ -229,20 +298,19 @@ with app.app_context():
     ###########################
     # Chercher le genre le plus associé au film + l'année la plus productive
     ###########################
-    max_genre = result_f_par_l[0]
+    max_genre = result_f_par_g[0]
     print("Le genre qui apparaît le plus : " + str(max_genre[0])) # Le premier de notre première requête
 
     # Requête pour trouver l'année la plus productive
-    result_max_ann = (
-        Film.query
-        .group_by(Film.release_date)
-        .add_columns(date_year,
-                    cpt_film) # 2ème et 3ème colonne (Année et total)
-        .order_by(cpt_film.desc())
-        .limit(1)
-        .all()
+    result_max_ann = req_joint_par_crit(
+        Film, date_year, False, "",
+        group_by=date_year,
+        add_filter=True,
+        filter=date_year != None,
+        limit=1
     )
-    max_annee = result_max_ann[0][1]
+
+    max_annee = result_max_ann[0][0]
     print("L'année la plus productive : " + str(max_annee)) # L'année la plus productive
     ###########################
     ###########################
@@ -262,7 +330,7 @@ with app.app_context():
     ####################################################
     total_budget_recette = (Film.query
                             .add_columns(somme_budget, somme_revenue)
-                            .first()
+                            .first()[1:]
                             )
     print("Le total des budgets et des recettes cumulés : \n"+str(total_budget_recette)+"\n")
     ###################################################
@@ -329,10 +397,49 @@ with app.app_context():
     ####################################################
 
     ####################################################
-    # PARTIE FORMATTAGE DES RÉSULTATS POUR LES VISUELS GRAPHIQUES (CHARTJS) { "mod" : [...], ""}
+    # PARTIE FORMATTAGE DES RÉSULTATS POUR LES VISUELS GRAPHIQUES (CHARTJS) { "mod" : [...], "val" : [...]}
     ####################################################
 
     # Dans cette partie, je vais mettre en forme mes réponses pour qu'il puisse être récupérée par l'application et le javascript (render_templates, jsonify)
+    # Création d'une fct utilitaire pour la mise en forme des résultats en JSON
+    def mise_forme_resultats_graph(donnees, empl_mod = 0, empl_chiffre = 1):
+        """
+        Mettre en forme les résultats poru les visualisations graphiques (ChartJS) avec JSON (jsonify)
+        
+        Arguments :
+        - donnees : Liste de tuple dont le premier emplacement représente la modalité et le deuxième la valeur
+        - empl_mod : l'emplacement dans le tuple où on peut trouver la modalité (par défaut : 0)
+        - empl_chiffre : l'emplacement dans le tuple où on peut trouver l'effectif (par défaut : 1)
+
+        Retour :
+        - dictionnaire de liste {"mod" : [...], "eff" : [...]}
+        """
+
+        if type(donnees) != list :
+            raise TypeError("L'argument 'donnees' n'est pas une liste")
+        
+        if any([type(tupl)==tuple for tupl in donnees]) :
+            raise TypeError("L'argument 'donnees' ne doit posséder que des tuples")
+        
+        dict_donn = {
+            "mod" : [],
+            "eff" : []
+        }
+        
+        for tupl in donnees:
+            dict_donn["mod"].append(tupl[empl_mod])
+            dict_donn["eff"].append(tupl[empl_chiffre])
+        
+        return dict_donn
+    
+    dict_f_par_g = mise_forme_resultats_graph(result_f_par_g)
+    print(dict_f_par_g)
+
+    dict_f_par_a = mise_forme_resultats_graph(result_f_par_a)
+    print(dict_f_par_a)
+
+    dict_f_par_l = mise_forme_resultats_graph(result_f_par_l)
+    print(dict_f_par_l)
 
     ####################################################
     ####################################################
