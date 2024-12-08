@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test de récupération des informations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
+  </head>
+  <body>
+
+    <!-- SECTION 1 : Films selon différents critères -->
+    <div>
+        <h3> Section 1 </h3>
+        <canvas id="sect11"></canvas>
+        <canvas id="sect12"></canvas>
+        <canvas id="sect13"></canvas>
+
+        <!-- Pour les indicateurs de genres et d'années ou le plus de films sont faites -->
+         <div> Le genre qui apparaît le plus dans les films {{ genre_max }}</div>
+         <div> L'année la plus productive : {{ annee_plus_prod }}</div>
+
+    </div>
+    <!-- SECTION 2 : Staitistiques fincanciers -->
+    <div>
+        <h3> Section 2 </h3>
+        <div> {{ total_budg_rec }}</div>
+        <div> {{ r_top_10_plus_cher }}</div>
+        <div> {{ r_top_10_plus_rentable }}</div>
+        <div> {{ r_top_10_plus_deficit }}</div>
+    </div>
+
+    <!-- SECTION 3 : Statistiques sur les votes -->
+    <div>
+        <h3> Section 3 </h3>
+        <div> {{ r_top_10_mieux_notes }}</div>
+        <div> {{ r_top_10_plus_votes }}</div>
+        <div> {{ r_top_10_plus_populaires }}</div>
+    </div>
+
+    <!-- SECTION 4 : Staitistiques sur les durées -->
+    <div>
+        <h3> Section 4 </h3>
+        <div> {{ r_top_10_plus_long }}</div>
+        <div> {{ r_top_10_plus_court }}</div>
+    </div>
+  </body>
+</html>

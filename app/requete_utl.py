@@ -204,9 +204,9 @@ def films_par_langue():
 
     return result_f_par_l
 
-    ###########################
-    # Nombre de films par année (20 dernières années)
-    ###########################
+###########################
+# Nombre de films par année (20 dernières années)
+###########################
 def films_par_annee():
 
     # Création de la variable d'année
@@ -227,6 +227,10 @@ def films_par_annee():
 
     return result_f_par_a
 
+###########################
+# L'année la plus productive
+###########################
+
 def annee_plus_productive():
     # Création de la variable d'année
     date_year = func.extract("year", Film.release_date)
@@ -241,6 +245,25 @@ def annee_plus_productive():
     )
 
     return result_max_ann[0]
+
+############################
+# Genre contenant le plus de film
+############################
+def max_films_genre():
+    """
+    Fonction : requête SQL pour récupérer le nombre de films par genre avec mise en forme des résultats
+    Retour : Dictionnaire de liste ({"mod" : [...], "eff" : [...]})
+    """
+
+    # Application de la requête SQL
+    result_f_par_g = req_joint_par_crit(Genre, # Table en question 
+                                        Genre.genre, # Colonne concernée
+                                       film_genres, # Table d'association
+                                       film_genres.c.id_genres, # Colonne de la table d'association
+                                       limit=1
+                                       ) 
+
+    return result_f_par_g[0]
 
 ####################################################
 # SECTION 2 : Statistiques financières
@@ -352,27 +375,27 @@ def top_10_plus_court():
     
     return result_f_plus_court
 
-with app.app_context() :
+if __name__=="__main__":
+    with app.app_context() :
 
-    # Test pour la première section
-    print("Le nombre de films par genre : \n"+str(films_par_genre()) + "\n")
-    print("Le nombre de films par langue : \n"+str(films_par_langue()) + "\n")
-    print("Le nombre de films par année : \n"+str(films_par_annee()) + "\n")
-    max_genre = (films_par_genre()["mod"][0], films_par_genre()["eff"][0])
-    print("Le genre qui apparaît le plus : " + str(max_genre)) # Le premier de notre première requête
-    print("L'année la plus productive : " + str(annee_plus_productive())) # L'année la plus productive
+        # Test pour la première section
+        print("Le nombre de films par genre : \n"+str(films_par_genre()) + "\n")
+        print("Le nombre de films par langue : \n"+str(films_par_langue()) + "\n")
+        print("Le nombre de films par année : \n"+str(films_par_annee()) + "\n")
+        print("Le genre qui apparaît le plus : " + str(max_films_genre())) # Le premier de notre première requête
+        print("L'année la plus productive : " + str(annee_plus_productive())) # L'année la plus productive
 
-    # Test pour la deuixème section
-    print("Le total des budgets et des recettes cumulés : \n"+str(total_budget_recette())+"\n")
-    print("Les dix films les plus chères : \n"+str(top_10_plus_cher())+"\n") # Les instances des films
-    print("Les dix films les plus rentables : \n"+str(top_10_plus_rentables())+"\n") # Les instances des films
-    print("Les dix films les plus déficitaires : \n"+str(top_10_plus_deficit())+"\n") # Les instances des films
+        # Test pour la deuixème section
+        print("Le total des budgets et des recettes cumulés : \n"+str(total_budget_recette())+"\n")
+        print("Les dix films les plus chères : \n"+str(top_10_plus_cher())+"\n") # Les instances des films
+        print("Les dix films les plus rentables : \n"+str(top_10_plus_rentables())+"\n") # Les instances des films
+        print("Les dix films les plus déficitaires : \n"+str(top_10_plus_deficit())+"\n") # Les instances des films
 
-    # Test pour la troisième section
-    print("Les dix films les mieux notés : "+ str(top_10_mieux_notes())) # Instances de films
-    print("Les dix films les plus votés : "+ str(top_10_plus_votes())) # Instances de films
-    print("Les dix films les plus populaires : "+ str(top_10_plus_populaires())) # Instances de films
+        # Test pour la troisième section
+        print("Les dix films les mieux notés : "+ str(top_10_mieux_notes())) # Instances de films
+        print("Les dix films les plus votés : "+ str(top_10_plus_votes())) # Instances de films
+        print("Les dix films les plus populaires : "+ str(top_10_plus_populaires())) # Instances de films
 
-    # Test pour la quatrième section
-    print("Les dix films les plus longues : "+ str(top_10_plus_long())) # Instances de films
-    print("Les dix films les plus courtes : "+ str(top_10_plus_court())) # Instances de films
+        # Test pour la quatrième section
+        print("Les dix films les plus longues : "+ str(top_10_plus_long())) # Instances de films
+        print("Les dix films les plus courtes : "+ str(top_10_plus_court())) # Instances de films
