@@ -4,7 +4,9 @@
 # Sujet : création des tables pour la bdd
 #################################################
 
-# Chargement de la librairie
+# Chargement des librairies
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -110,15 +112,15 @@ class Acteur(db.Model):
 
 
 ##############################
-# ---- Pour la table Langage ----
+# ---- Pour la table Language ----
 ##############################
-class Langage(db.Model):
-    __tablename__="langages"
+class Language(db.Model):
+    __tablename__="languages"
     
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
-    langage = db.Column(db.String(50), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
 
 
 ##############################
@@ -169,15 +171,15 @@ film_acteurs = db.Table(
               db.ForeignKey('acteurs.id'), primary_key=True)
 )
 
-# Pour Film et Langage
-film_langages = db.Table(
-    'film_langages',
+# Pour Film et Language
+film_languages = db.Table(
+    'film_languages',
 
     db.Column('id_film', db.Integer,
               db.ForeignKey("films.id"), primary_key=True),
     
-    db.Column('id_langage', db.Integer,
-              db.ForeignKey('langages.id'), primary_key=True),
+    db.Column('id_language', db.Integer,
+              db.ForeignKey('languages.id'), primary_key=True),
     
     db.Column('original', db.Boolean, nullable=False)
 )
