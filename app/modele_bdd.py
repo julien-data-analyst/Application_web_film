@@ -29,22 +29,27 @@ def run_notebook(notebook_path, timeout=600):
     # Configure the execution
     ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
 
-    # Create a new namespace
+    # Create a namespace to capture global variables/functions
     namespace = {}
 
     # Execute the notebook
     try:
         ep.preprocess(notebook, {'metadata': {'path': './'}})
-        # Extract all variables/functions from the notebook cells
-        exec('\n'.join(cell['source'] for cell in notebook.cells if cell.cell_type == 'code'), namespace)
+        # Extract all code cells and execute them in the namespace
+        for cell in notebook.cells:
+            if cell.cell_type == 'code':
+                exec(cell.source, namespace)
     except Exception as e:
         print(f"Error executing the notebook: {e}")
 
     return namespace
 
-# Example usage
-namespace = run_notebook('./code/explo.ipynb')
-print(namespace.keys())  # Check what variables/functions are imported
+namespace = run_notebook("./explo.ipynb")
+
+# Access specific variables or functions
+if "dataset" in namespace:
+    dataset = namespace["dataset"]  # 'dataset' is a variable in the notebook
+    print(dataset.head())  # Example operation
 
 
 
