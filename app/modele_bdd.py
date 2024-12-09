@@ -73,7 +73,7 @@ class Film(db.Model):
                              backref='films',
                              lazy = "dynamic")
 
-    companies = db.relationship('Companie',
+    companies = db.relationship('Company',
                              secondary="film_companies",
                              backref='films',
                              lazy = 'dynamic')

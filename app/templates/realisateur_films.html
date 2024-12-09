@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test de récupération des informations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
+  </head>
+  <body>
+    <!-- Partie messagerie -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-warning">
+              <button type="button" 
+              class="btn-close" 
+              data-bs-dismiss="alert" 
+              aria-label="Close">
+                </button>
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+    
+    <!-- Partie films réalisés -->
+     <h2> Les films réalisés par le directeur {{ films_real.nom }} {{ films_real.prenom }} : </h2>
+     <ul>
+     {% for film in films_real.films %}
+        <li>Titre du film : {{ film.title }}</li>
+        <ul>
+        <li>Son résumé : <p>{{ film.overwiew }}</p></li>
+        <li>Ses acteurs : {{ film.acteurs[0] }}</li>
+        <li>Sa date de sortie : {{ film.release_date }}</li>
+        <!-- Compléter pour langue d'origine-->
+        <li>Sa note moyenne : {{ film.vote_average }}</li>
+        <li>L'indice de popularité de ce film : {{ film.popularity }}</li>
+        </ul>
+        <br />
+     {% endfor %}
+    </ul>   
+ </body>
+
+</html>

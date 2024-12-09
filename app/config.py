@@ -17,4 +17,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
 # ---- Configuration de la clé secrète
-app.secret_key = secrets.token_hex(16) # aléatoire
+app.config["SECRET_KEY"] = secrets.token_hex(16) # aléatoire

@@ -12,11 +12,12 @@ from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_gr
                         films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
                         top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
                         top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
-                        top_10_realisateur
+                        top_10_realisateur, rech_real
 
+from formulaire_real import RealForm
 from sqlalchemy.sql import insert
 import datetime
-from flask import render_template, jsonify
+from flask import render_template, jsonify, flash, redirect, url_for, session
 
 # Attention : se placer dans le dossier app pour tester le programme
 # Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
@@ -57,6 +58,50 @@ def informations():
                            r_top_10_real_film = r_top_10_real_film # [(nom_directeur, prenom_directeur, effectif)]
                            )
 
+#################################
+# Création de la page du formulaire pour la recherche de réalisateur
+#################################
+@app.route('/rech_real', methods=["GET", "POST"])
+def recherche_realisateur():
+    # Pour le formulaire
+    form = RealForm()
+
+    # ---- Les top 10 ----
+    r_top_10_mieux_notes = top_10_mieux_notes()
+    r_top_10_plus_populaires = top_10_plus_populaires()
+    r_top_10_real_film = top_10_realisateur()
+    reals=[]
+
+    if form.validate_on_submit():
+        # Récupération de la recherche de l'utilisateur après validation de la demande
+        nom_real = form.nom_real.data
+        #print(nom_real)
+        reals = rech_real(nom_real)
+
+        if reals == []:
+            # Message d'attention à l'utilisateur sur la non trouvaille du nom
+            flash("Nous n'avons pas pu trouvé de réalisateurs correspondant à votre recherche")
+
+            # Retour du formulaire sans la possibilité de renvoyer les données envoyées
+            return redirect(url_for('recherche_realisateur'))
+
+        
+    return render_template("realisateur.html",
+                           form = form,
+                           reals = reals,
+                           r_top_10_mieux_notes =  r_top_10_mieux_notes,
+                           r_top_10_plus_populaires = r_top_10_plus_populaires,
+                           r_top_10_real_film = r_top_10_real_film)
+
+# Création de la route pour afficher les films réalisés par le réalisateur/directeur
+@app.route("/films_realisateur/<id_dir>")
+def aff_film(id_dir):
+
+    # Recherche SQL sur les films réalisés par ce directeur
+    resultat = Directeur.query.filter(Directeur.id == id_dir).first()
+
+    return render_template("realisateur_films.html",
+                           films_real = resultat)
 ##################################
 # Création des routes spécifiques pour la Data 
 # JSON avec Fetch 

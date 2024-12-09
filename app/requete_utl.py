@@ -396,6 +396,23 @@ def top_10_realisateur():
 
     return result_f_r
 
+# Pour la recherche dans le formulaire
+def rech_real(nom_real):
+    """
+    Fonction : rechercher les réalisateurs qui ont ce nom partiellement ou égale.
+    Argument : 
+    - nom_real : nom du réalisateur
+
+    Retour :
+    - une liste d'instance de directeur dont le nom correspond partiellement à celui demandé
+    """
+
+    # Application de la requête SQL (vérifier s'il on doit faire sur le prénom aussi (condition de ou à ajouter dans ces cas là))
+    search = "%{}%".format(nom_real)
+    results = Directeur.query.filter(Directeur.nom.like(search)).all()
+
+    return results
+
 if __name__=="__main__":
     with app.app_context() :
 
@@ -435,3 +452,7 @@ if __name__=="__main__":
 
         print("Les réalisateurs des 10 films les mieux notés : "+str(liste_real_not))
         print("Les réalisateurs des 10 films les plus populaires : "+str(liste_real_pop))
+
+        # Au niveau de la recherche des directeurs
+        print("Les directeurs possédant le nom 'Dir' : " + str(rech_real("Dir5")))
+        print("Le nombre de films du premier directeur dans la fonction de recherche : " + str(rech_real("Dir")[0].films.count()))

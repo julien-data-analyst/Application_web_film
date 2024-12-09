@@ -9,11 +9,11 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 
 # Création du formulaire 
-class FormulaireRealisateur(FlaskForm):
+class RealForm(FlaskForm):
 
     # Création de la barre de recherche pour le nom du réalisateur
-    nom_pre = StringField(label="Nom du réalisateur : ",
-              validators = [DataRequired(message="Saisir NOM Prénom Valide !!!")])
+    nom_real = StringField(label="Nom du réalisateur : ",
+              validators = [DataRequired(message="Veuillez saisir un nom !!!")])
 
     # Création du bouton rechercher
     envoyer = SubmitField(label="Chercher")
