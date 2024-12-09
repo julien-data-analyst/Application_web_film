@@ -11,6 +11,49 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
+#___________________________________________________________________ #
+# Chargement des données préparées.
+def run_notebook(notebook_path, timeout=600):
+    """
+    Executes a Jupyter notebook and returns its namespace.
+    
+    :param notebook_path: Path to the Jupyter notebook file.
+    :param timeout: Timeout in seconds for each cell execution.
+    :return: A dictionary containing the global variables and functions from the notebook.
+    """
+    # Load the notebook
+    with open(notebook_path, 'r', encoding='utf-8') as f:
+        notebook = nbformat.read(f, as_version=4)
+
+    # Configure the execution
+    ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
+
+    # Create a new namespace
+    namespace = {}
+
+    # Execute the notebook
+    try:
+        ep.preprocess(notebook, {'metadata': {'path': './'}})
+        # Extract all variables/functions from the notebook cells
+        exec('\n'.join(cell['source'] for cell in notebook.cells if cell.cell_type == 'code'), namespace)
+    except Exception as e:
+        print(f"Error executing the notebook: {e}")
+
+    return namespace
+
+# Example usage
+namespace = run_notebook('./code/explo.ipynb')
+print(namespace.keys())  # Check what variables/functions are imported
+
+
+
+
+
+
+
+
+
 #########################################
 ### Créer les colonnes des tables ####
 ########################################
@@ -48,7 +91,7 @@ class Film(db.Model):
                              secondary="film_genres",
                              backref='films')
 
-    companies = db.relationship('Companie',
+    companies = db.relationship('Company',
                              secondary="film_companies",
                              backref='films')
     
@@ -126,7 +169,7 @@ class Language(db.Model):
 ##############################
 # ---- Pour la table Production_Company ----
 ##############################
-class Companie(db.Model):
+class Company(db.Model):
     __tablename__="companies"
     
     # Création des différentes colonnes
@@ -149,7 +192,7 @@ film_genres = db.Table(
               db.ForeignKey('genres.id'), primary_key=True)
 )
 
-# Pour Film et Companie
+# Pour Film et Company
 film_companies = db.Table(
     'film_companies',
 
