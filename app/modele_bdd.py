@@ -17,6 +17,32 @@ db = SQLAlchemy()
 # ---- Pour la table Film ----
 ##############################
 class Film(db.Model):
+    """
+    Création de la table Film dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - title : titre du film
+    - release_date : date de sortie
+    - popularity : l'indice de popularité [0, 1]
+    - runtime : durée du film en minute
+    - budget : budget du film en million de $
+    - revenue : revenue du film en million de $
+    - tagline : phrase clé (slogan) du film
+    - overwiew : résumé du film
+    - poster_path : url du poster du film
+    - vote_count : nombre de personnes qui ont voté
+    - vote_average : note moyenne des personnes qui ont voté
+    
+    Pour les relations étrangères (* à 1)
+    - id_directeur : clé étrangère montrant le réalisateur/directeur qui a fait le film
+    - id_collection : clé étrangère montrant s'il fait partie ou non d'une collection
+    
+    Pour les relations étrangères (* à *)
+    - genres : permet de voir les genres associés au film en question
+    - companies : permet de voir les companies de productions associées au film en question
+    - acteurs : permet de voir les acteurs associés au film en question
+    - langages : permet de voir les langues disponibles du film en question
+    """
     __tablename__= "films" # Nom de la table dans la BDD SQLite
 
     # Création des différentes colonnes
@@ -66,6 +92,14 @@ class Film(db.Model):
 # ---- Pour la table Directeur ----
 ##############################
 class Directeur(db.Model):
+    """
+    Création de la table Film dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - nom : nom du directeur
+    - prenom : prénom du directeur
+    """
+
     __tablename__ = "directeurs"
     
     # Création des différentes colonnes
@@ -82,6 +116,12 @@ class Directeur(db.Model):
 # ---- Pour la table Genre ----
 ##############################
 class Genre(db.Model):
+    """
+    Création de la table Genre dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - genre : le genre associé
+    """
     __tablename__ = "genres"
     
     # Création des différentes colonnes
@@ -93,6 +133,12 @@ class Genre(db.Model):
 # ---- Pour la table Collection ----
 ##############################
 class Collection(db.Model):
+    """
+    Création de la table Collection dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - name : nom de la collection 
+    """
     __tablename__="collections"
     
     # Création des différentes colonnes
@@ -108,6 +154,13 @@ class Collection(db.Model):
 # ---- Pour la table Acteur ----
 ##############################
 class Acteur(db.Model):
+    """
+    Création de la table Acteur dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - nom : nom de l'acteur
+    - prenom : prénom de l'acteur
+    """
     __tablename__="acteurs"
     
     # Création des différentes colonnes
@@ -121,6 +174,12 @@ class Acteur(db.Model):
 # ---- Pour la table Langage ----
 ##############################
 class Langage(db.Model):
+    """
+    Création de la table Langage dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - langage : la langue en question
+    """
     __tablename__="langages"
     
     # Création des différentes colonnes
@@ -132,7 +191,13 @@ class Langage(db.Model):
 ##############################
 # ---- Pour la table Production_Company ----
 ##############################
-class Companie(db.Model):
+class Company(db.Model):
+    """
+    Création de la table Companie dans la BDD.
+    Elle contient comme colonnes :
+    - id : clé primaire permettant d'identifier la ligne en question
+    - name : nom de la companie
+    """
     __tablename__="companies"
     
     # Création des différentes colonnes

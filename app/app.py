@@ -11,17 +11,15 @@ from modele_bdd import db, Genre, Film, Directeur, Langage, film_langages, film_
 from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_graph, \
                         films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
                         top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
-                        top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre
+                        top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
+                        top_10_realisateur
+
 from sqlalchemy.sql import insert
 import datetime
 from flask import render_template, jsonify
 
 # Attention : se placer dans le dossier app pour tester le programme
 # Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
-
-@app.route('/', methods=["GET", "POST"]) # Préciser les requêtes http possibles, sinon erreur 405
-def index():
-    return '<h1>Bienvenue au site</h1>'
 
 @app.route('/inf', methods=["GET", "POST"])
 def informations():
@@ -42,6 +40,7 @@ def informations():
     r_top_10_plus_court = top_10_plus_court()
     r_top_10_plus_deficit = top_10_plus_deficit()
     r_top_10_plus_rentable = top_10_plus_rentables()
+    r_top_10_real_film = top_10_realisateur()
 
     return render_template("page_test_req.html",
                            annee_plus_prod = annee_plus_prod,
@@ -54,7 +53,8 @@ def informations():
                            r_top_10_plus_deficit = r_top_10_plus_deficit,
                            r_top_10_plus_votes = r_top_10_plus_votes,
                            r_top_10_plus_populaires = r_top_10_plus_populaires,
-                           r_top_10_plus_rentable = r_top_10_plus_rentable
+                           r_top_10_plus_rentable = r_top_10_plus_rentable,
+                           r_top_10_real_film = r_top_10_real_film # [(nom_directeur, prenom_directeur, effectif)]
                            )
 
 ##################################
@@ -129,11 +129,19 @@ if __name__ == "__main__":
         new_langage = Langage(langage="French")
         new_langage_2 = Langage(langage="Allemand")
         new_langage_3 = Langage(langage="Espagnol")
+
+        # Pour les directeurs
         new_dir = Directeur(nom="Dir", prenom='Dir')
+        new_dir_2 = Directeur(nom="Dir2", prenom="Dir2")
+        new_dir_3 = Directeur(nom="Dir3", prenom="Dir3")
 
         # Ajout du lien entre Genre et Film
         new_genre.films.extend([new_film])
         new_film.genres.extend([new_genre_2])
+
+        new_dir.films.extend([new_film, new_film_2])
+        new_dir_2.films.extend([new_film_3, new_film_4, new_film_5])
+        new_dir_3.films.extend([new_film_6])
 
         db.session.add_all([new_langage, new_film, new_film_2, new_film_3,
                             new_langage_2, new_langage_3, 

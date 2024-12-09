@@ -131,10 +131,10 @@ def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter
         )
 
     # Faisons le group_by + order_by
-    if not(isinstance(group_by, ColumnElement)) : # Si ce n'est pas une instance de colonne élément
+    if not(isinstance(group_by, ColumnElement)) : # Si ce n'est pas une instance de colonne
         group_by = col
     
-    if not(isinstance(order_by, ColumnElement)) : # Si ce n'est pas une instance de colonne élément
+    if not(isinstance(order_by, ColumnElement)) : # Si ce n'est pas une instance de colonne
         order_by = -col_cal
 
     query_sql = (
@@ -316,7 +316,7 @@ def top_10_plus_deficit():
     # Création de la colonne calculée
     deficit = Film.revenue - Film.budget
 
-    # Application de la requete SQL
+    # Application de la requête SQL
     result_f_plus_def = inf_film_10(col=deficit, cond=deficit <= 0, calcule=True)
 
     return result_f_plus_def
@@ -327,6 +327,7 @@ def top_10_plus_deficit():
 ####################################################
 
 # Les dix films les mieux notés (vote_average)
+# Pour récupérer le directeur : result_f_n[0].directeur
 def top_10_mieux_notes():
 
     # Application de la requête SQL
@@ -375,6 +376,26 @@ def top_10_plus_court():
     
     return result_f_plus_court
 
+####################################################
+# POUR LES PAGES : REALISATEURS / ACTEURS 
+####################################################
+# Les 10 réalisateurs ayant réalisé le plus de films
+def top_10_realisateur():
+    # Création de la colonne calculé
+    cpt_film = func.count(Film.id)
+
+    # Application de la requête SQL
+    result_f_r = (
+        db.session.query(Directeur.nom, Directeur.prenom, cpt_film)
+        .join(Film, Directeur.id == Film.id_directeur) # Jointure avec la table Film
+        .group_by(Directeur.id) # Grouper par directeur
+        .order_by(-cpt_film) # Ordre décroissant
+        .limit(10)
+        .all()
+    )
+
+    return result_f_r
+
 if __name__=="__main__":
     with app.app_context() :
 
@@ -399,3 +420,18 @@ if __name__=="__main__":
         # Test pour la quatrième section
         print("Les dix films les plus longues : "+ str(top_10_plus_long())) # Instances de films
         print("Les dix films les plus courtes : "+ str(top_10_plus_court())) # Instances de films
+
+        # Test pour la partie Page/Réalisateur
+        print("Les dix réalisateurs qui ont réalisé le plus de film : "+str(top_10_realisateur()))
+        
+        # Pour récupérer les réalisateurs des 10 films les mieux notés / les plus populaires
+        liste_real_not = []
+        for film in top_10_mieux_notes():
+            liste_real_not.append(film.directeur)
+
+        liste_real_pop = []
+        for film in top_10_plus_populaires():
+            liste_real_pop.append(film.directeur)
+
+        print("Les réalisateurs des 10 films les mieux notés : "+str(liste_real_not))
+        print("Les réalisateurs des 10 films les plus populaires : "+str(liste_real_pop))

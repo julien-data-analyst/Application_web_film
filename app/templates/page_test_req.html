@@ -44,5 +44,12 @@
         <div> {{ r_top_10_plus_long }}</div>
         <div> {{ r_top_10_plus_court }}</div>
     </div>
+
+    <div>
+      <h3> Pour la page Réalisateur / Artiste </h3>
+      <div> {{ r_top_10_real_film }}</div>
+      <div> Pour accéder le directeur des films les mieux notés : {{ r_top_10_mieux_notes[0].directeur.nom }} {{ r_top_10_mieux_notes[0].directeur.prenom }}</div>
+      <div>     Pour accéder le directeur des films les plus populaires : {{ r_top_10_plus_populaires[0].directeur.nom }} {{ r_top_10_plus_populaires[0].directeur.prenom }}</div>
+    </div>
   </body>
 </html>
