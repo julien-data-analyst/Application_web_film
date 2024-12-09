@@ -5,53 +5,9 @@
 #################################################
 
 # Chargement des librairies
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-
-
-#___________________________________________________________________ #
-# Chargement des données préparées.
-def run_notebook(notebook_path, timeout=600):
-    """
-    Executes a Jupyter notebook and returns its namespace.
-    
-    :param notebook_path: Path to the Jupyter notebook file.
-    :param timeout: Timeout in seconds for each cell execution.
-    :return: A dictionary containing the global variables and functions from the notebook.
-    """
-    # Load the notebook
-    with open(notebook_path, 'r', encoding='utf-8') as f:
-        notebook = nbformat.read(f, as_version=4)
-
-    # Configure the execution
-    ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
-
-    # Create a namespace to capture global variables/functions
-    namespace = {}
-
-    # Execute the notebook
-    try:
-        ep.preprocess(notebook, {'metadata': {'path': './'}})
-        # Extract all code cells and execute them in the namespace
-        for cell in notebook.cells:
-            if cell.cell_type == 'code':
-                exec(cell.source, namespace)
-    except Exception as e:
-        print(f"Error executing the notebook: {e}")
-
-    return namespace
-
-namespace = run_notebook("./explo.ipynb")
-
-# Access specific variables or functions
-if "dataset" in namespace:
-    dataset = namespace["dataset"]  # 'dataset' is a variable in the notebook
-    print(dataset.head())  # Example operation
-
-
 
 
 
