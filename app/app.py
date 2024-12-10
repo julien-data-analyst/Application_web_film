@@ -34,7 +34,7 @@ def informations():
     annee_plus_prod = annee_plus_productive()
     total_budg_rec = total_budget_recette()
     genre_max = max_films_genre()
-
+    
     # ---- Les top 10 ----
     r_top_10_mieux_notes = top_10_mieux_notes()
     r_top_10_plus_votes = top_10_plus_votes()
