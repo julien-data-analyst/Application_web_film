@@ -63,7 +63,8 @@ collection = namespace["collection"]
 original_language = namespace["original_language"]
 spoken_languages = namespace["spoken_language"]
 production = namespace["production"]
-people = namespace["person_director_table"]
+actor = namespace["actor"]
+director = namespace["director"]
 
 # ---------------------------------------------------- #
 
@@ -73,3 +74,10 @@ with app.app_context():
         db.session.add(collection)
     db.session.commit()
     print("Collections data inserted successfully!")
+    
+with app.app_context():
+    for index, row in actor.iterrows():
+        actor = Acteur(id=row["id"], name=row["person"])
+        db.session.add(actor)
+    db.session.commit()
+    print("Actors successfully added.")
