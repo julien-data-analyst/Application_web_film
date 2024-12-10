@@ -6,7 +6,18 @@
 
 # Chargement des librairies
 import os
-from modele_bdd import db, Collection, Film, Directeur, Genre, Acteur, Language, Company
+from config import app
+from modele_bdd import db, Genre, Film, Directeur, Language, Company, Acteur, Collection, film_languages, film_genres # Toutes les tables et relations
+from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_graph, \
+                        films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
+                        top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
+                        top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
+                        top_10_realisateur, rech_films, rech_genres
+
+from formulaire_real import RealForm, TitGenForm
+from sqlalchemy.sql import insert
+import datetime
+from flask import render_template, jsonify, flash, redirect, url_for, session
 from config import app
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -20,6 +31,7 @@ db.init_app(app)
 with app.app_context():
     db.drop_all()
     db.create_all()
+
 #___________________________________________________________________ #
 # Chargement des données préparées.
 def run_notebook(notebook_path, timeout=600):
@@ -116,4 +128,4 @@ with app.app_context():
         langss = Language(language = row["spoken_languages"])
         db.session.add(langss)
     db.session.commit()
-    print("Languages added.")
+    print("Languages added.") 

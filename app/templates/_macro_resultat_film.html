@@ -1,0 +1,41 @@
+<!-- 
+     Auteur : Julien RENOULT 
+     Sujet : Macro des résulats de recherche de film (lien réalisateur ou formulaire de recherche de films)
+     Date : 10/12/2024 
+     Fonction : faire la mise en forme des résultats des films 
+     Arguments :
+     - films : liste d'instances des films à présenter
+     - valeur : valeur recherchée
+     - type : quelle est le type de recherche (str)
+        - dir : recherche par réalisateur/directeur
+        - genre : recherche par genre de film
+        - titre : rechercher par titre du film
+-->
+
+{% macro afficher_resultat_films(films, type, valeur) %}
+{% if type == "dir" %}
+<h2> Les films réalisés par le directeur {{ valeur.nom }} {{ valeur.prenom }} : </h2>
+{% elif type == "Genre" %}
+<h2> Films du genre "{{ valeur }}" </h2>
+{% else %}
+<h2> Films du titre "{{ valeur }}"</h2>
+{% endif %}
+     <ul>
+     {% for film in films %}
+        <li>Titre du film : {{ film.title }}</li>
+        <ul>
+            <!-- Les informations du film concerné -->
+            <li>Son résumé : <p>{{ film.overwiew }}</p></li>
+            {% if type != "dir" %}
+                <li>Son réalisateur : {{ film.directeur }}</li>
+            {% endif %}
+            <li>Ses acteurs : {{ film.acteurs[0] }}</li> <!-- À modifier plus tard -->
+            <li>Sa date de sortie : {{ film.release_date }}</li> <!-- N'avoir que l'année de sortie -->
+            <!-- Compléter pour langue d'origine-->
+            <li>Sa note moyenne : {{ film.vote_average }}</li>
+            <li>L'indice de popularité de ce film : {{ film.popularity }}</li>
+        </ul>
+        <br />
+     {% endfor %}
+    </ul>   
+{% endmacro %}

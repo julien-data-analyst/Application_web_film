@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test de récupération des informations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
+  </head>
+  <body>
+    {% from "_macro_resultat_film.html" import afficher_resultat_films %}
+    <!-- Partie messagerie -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-warning">
+              <button type="button" 
+              class="btn-close" 
+              data-bs-dismiss="alert" 
+              aria-label="Close">
+                </button>
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <!-- Partie films réalisés -->
+    {{ afficher_resultat_films(films_real.films, "dir", films_real) }}
+    </body>
+
+</html>
