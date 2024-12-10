@@ -177,6 +177,11 @@ def extract_year(date_year):
     return year
 
 #___________________________________________________________________ #
+with app.app_context():
+    db.drop_all()
+    db.create_all()
+
+#___________________________________________________________________ #
 # Chargement des données préparées.
 def run_notebook(notebook_path, timeout=600):
     """
@@ -219,10 +224,6 @@ production = namespace["list_production"]
 actor = namespace["list_actors"]
 director = namespace["list_directors"]
 # --------------------------------------------------------------------- #
-
-with app.app_context():
-    db.drop_all()
-    db.create_all()
 
 # Insert collection into the db
 with app.app_context():
@@ -278,5 +279,75 @@ with app.app_context():
     db.session.commit()
     print("Languages added.") 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+# Insert into the table Film and the related associated tables
+with app.app_context():
+    for index, row in dataset.iterrows():
+        # Ensure all critical film attributes are valid
+        orig_lang = Language.query.filter_by(language=row["original_language"]).first()
+        direc = Directeur.query.filter_by(nom=row["lastname"], prenom=row["firstname"]).first()
+        collec = Collection.query.filter_by(name=row["belongs_to_collection"]).first()
+
+        if not orig_lang or not direc or not collec:
+            continue
+        
+        # Initialize film object
+        film = Film()
+        
+        film.id = row["id"]
+        film.title = row["title"]
+        film.release_date = row["release_date"]
+        film.popularity = row["popularity"]
+        film.runtime = row["runtime"]
+        film.budget = row["budget_musd"] if not pd.isna(row["budget_musd"]) else 0
+        film.revenue = row["revenue_musd"] if not pd.isna(row["revenue_musd"]) else 0
+        film.tagline = row["tagline"] if not pd.isna(row["tagline"]) else None
+        film.overview = row["overview"] if not pd.isna(row["overview"]) else None
+        film.poster_path = row["poster"]
+        film.vote_count = row["vote_count"]
+        film.vote_average = row["vote_average"]
+        film.id_original_language = orig_lang.id
+        film.id_directeur = direc.id
+        film.id_collection = collec.id
+
+        # initialiser les clé étragères : film.fk = orig_lang.id    
+        db.session.add(film)
+        db.session.flush()
+        print(f"Inserting data...")
+        
+        # Insert into association tables
+
+        # Genres
+        genres = row["genres"].split("|") if not pd.isna(row["genres"]) else []
+        for genre_name in genres:
+            genre = Genre.query.filter_by(genre=genre_name.strip()).first()
+            if not genre:
+                genre = Genre(genre=genre_name.strip())
+                db.session.add(genre)
+                db.session.flush()  # Generate genre ID
+            db.session.execute(film_genres.insert().values(id_film=film.id, id_genres=genre.id))
+
+        # Companies
+        companies = row["production_companies"].split("|") if not pd.isna(row["production_companies"]) else []
+        for company_name in companies:
+            company = Company.query.filter_by(name=company_name.strip()).first()
+            if not company:
+                company = Company(name=company_name.strip())
+                db.session.add(company)
+                db.session.flush()  # Generate company ID
+            db.session.execute(film_companies.insert().values(id_film=film.id, id_companies=company.id))
+
+        if direc:
+            db.session.execute(film_directeurs.insert().values(id_film=film.id, id_directeur=direc.id))
+
+        # Spoken Languages
+        spoken_languages = row["spoken_languages"].split("|") if not pd.isna(row["spoken_languages"]) else []
+        for lang in spoken_languages:
+            language = Language.query.filter_by(language=lang.strip()).first()
+            if not language:
+                language = Language(language=lang.strip())
+                db.session.add(language)
+                db.session.flush()  # Generate language ID
+            db.session.execute(film_languages.insert().values(id_film=film.id, id_language=language.id))
+
+    db.session.commit()
