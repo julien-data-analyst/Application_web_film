@@ -5,7 +5,7 @@
 #################################################
 
 # ---- Chargement des librairies ----
-from modele_bdd import db, Genre, Film, Directeur, Langage, film_langages, film_genres # Toutes les tables et relations
+from modele_bdd import db, Genre, Film, Directeur, Language, film_languages, film_genres # Toutes les tables et relations
 from sqlalchemy.sql import insert, func # Les fonctions utilisées pour gérer les group_by et les aggrégations
 from sqlalchemy.sql.expression import ColumnElement
 from config import app
@@ -192,8 +192,8 @@ def films_par_langue():
 
     # Application de la requête SQL
     result_f_par_l = req_joint_par_crit(
-        Langage, Langage.langage, 
-        film_langages, film_langages.c.id_langage,
+        Language, Language.langage, 
+        film_languages, film_languages.c.id_language,
         limit=20
     )
 
@@ -410,8 +410,53 @@ def rech_films(nom, table, colonne):
     """
 
     # Application de la requête SQL (vérifier s'il on doit faire sur le prénom aussi (condition de ou à ajouter dans ces cas là))
+
+    colonne_order_by = Film.release_date
     search = "%{}%".format(nom) # Ce qui donne "%nom%"
-    results = table.query.filter(colonne.like(search)).all() # On récupère toutes les lignes qui contient ce sous-chaîne de caractère
+
+    if table == Directeur :
+        results = (table.query
+                   .join(Film, Film.id_directeur == Directeur.id)
+                   .filter(colonne.like(search))
+                   .order_by(colonne_order_by)
+                   .all()
+                ) # On récupère toutes les lignes qui contient ce sous-chaîne de caractère
+    elif table == Film :
+        results = (
+            table.query
+            .filter(colonne.like(search))
+            .order_by(colonne_order_by)
+            .all()
+        )
+    else:
+       results = (
+               table.query
+               .join(film_genres, Film.id == film_genres.c.id_film)
+               .join(Genre, film_genres.c.id_genres == Genre.id)
+               .filter(colonne.like(search))
+               .order_by(colonne_order_by)
+               .all()
+               )  
+
+    return results
+
+def rech_genres(name):
+    """
+    Fonction : rechercher les genres qui correspondent (à regarder avec ma fonction "req_joint_par_crit")
+    """
+    table = Film
+    colonne_order_by = Film.release_date
+    colonne_like = Genre.genre
+    search = "%{}%".format(name) 
+
+    results = (
+               table.query
+               .join(film_genres, Film.id == film_genres.c.id_film)
+               .join(Genre, film_genres.c.id_genres == Genre.id)
+               .filter(colonne_like.like(search))
+               .order_by(colonne_order_by)
+               .all()
+               )
 
     return results
 
@@ -455,6 +500,7 @@ if __name__=="__main__":
         print("Les réalisateurs des 10 films les mieux notés : "+str(liste_real_not))
         print("Les réalisateurs des 10 films les plus populaires : "+str(liste_real_pop))
 
+        print(rech_genres("dra"))
         # Au niveau de la recherche des directeurs
-        print("Les directeurs possédant le nom 'Dir' : " + str(rech_real("Dir5")))
-        print("Le nombre de films du premier directeur dans la fonction de recherche : " + str(rech_real("Dir")[0].films.count()))
+        #print("Les directeurs possédant le nom 'Dir' : " + str(rech_films("Dir5")))
+        #print("Le nombre de films du premier directeur dans la fonction de recherche : " + str(rech_real("Dir")[0].films.count()))

@@ -15,12 +15,11 @@
 {% macro afficher_resultat_films(films, type, valeur) %}
 {% if type == "dir" %}
 <h2> Les films réalisés par le directeur {{ valeur.nom }} {{ valeur.prenom }} : </h2>
-{% elif type == "genre" %}
+{% elif type == "Genre" %}
 <h2> Films du genre "{{ valeur }}" </h2>
 {% else %}
 <h2> Films du titre "{{ valeur }}"</h2>
 {% endif %}
-
      <ul>
      {% for film in films %}
         <li>Titre du film : {{ film.title }}</li>

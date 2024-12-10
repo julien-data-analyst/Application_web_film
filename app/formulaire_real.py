@@ -22,7 +22,7 @@ class RealForm(FlaskForm):
 class TitGenForm(FlaskForm):
 
     # Création des différents blocs de formulaires
-    type = RadioField('Recherche par : ', choices=["Genre", "Titre / Mot(s) clé(s)"], validators = [DataRequired()]) 
+    type = RadioField('Recherche par : ', choices=["Genre", "Titre"], validators = [DataRequired()]) 
     word = StringField('Insérez ici : ', validators = [DataRequired()])
 
-    find = SubmitField('Rechercher') 
+    envoyer = SubmitField('Rechercher') 

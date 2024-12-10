@@ -1,6 +1,6 @@
 #################################################
 # Auteurs : Julien RENOULT - Yop JUGUL DALYOP - Gabriel DURAND - Ryan DOBIGNY
-# Date : 03/12/2024
+# Date : 03/12/2024 - 10/12/2024
 # Sujet : création des tables pour la bdd
 #################################################
 
@@ -67,6 +67,9 @@ class Film(db.Model):
     id_collection = db.Column(db.Integer,
                               db.ForeignKey("collections.id"))
     
+    id_original_language = db.Column(db.Integer,
+                            db.ForeignKey("languages.id"))
+    
     # Création des relations étrangères (*-*)
     genres = db.relationship('Genre',
                              secondary="film_genres",
@@ -83,8 +86,8 @@ class Film(db.Model):
                              backref='films',
                              lazy="dynamic")
     
-    langages = db.relationship('Langage',
-                             secondary="film_langages",
+    languages = db.relationship('Language',
+                             secondary="film_languages",
                              backref='films',
                              lazy="dynamic")
     
@@ -171,22 +174,25 @@ class Acteur(db.Model):
 
 
 ##############################
-# ---- Pour la table Langage ----
+# ---- Pour la table Language ----
 ##############################
-class Langage(db.Model):
+class Language(db.Model):
     """
     Création de la table Langage dans la BDD.
     Elle contient comme colonnes :
     - id : clé primaire permettant d'identifier la ligne en question
     - langage : la langue en question
     """
-    __tablename__="langages"
+    __tablename__="languages"
     
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
     langage = db.Column(db.String(50), nullable=False)
 
+    # Création de la relation avec la clé étrangère (1-*)
+    films_org = db.relationship('Film', backref = 'language_org',
+    lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
 # ---- Pour la table Production_Company ----
@@ -243,12 +249,12 @@ film_acteurs = db.Table(
 )
 
 # Pour Film et Langage
-film_langages = db.Table(
-    'film_langages',
+film_languages = db.Table(
+    'film_languages',
 
     db.Column('id_film', db.Integer,
               db.ForeignKey("films.id"), primary_key=True),
     
-    db.Column('id_langage', db.Integer,
-              db.ForeignKey('langages.id'), primary_key=True)
+    db.Column('id_language', db.Integer,
+              db.ForeignKey('languages.id'), primary_key=True)
 )

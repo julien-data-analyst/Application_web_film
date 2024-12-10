@@ -8,6 +8,7 @@
     <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
   </head>
   <body>
+    {% from "_macro_resultat_film.html" import afficher_resultat_films %}
     <!-- Partie messagerie -->
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -29,9 +30,15 @@
         {{ form.csrf_token }}
 
         <div>
-            {{ form.nom_real.label(class = "form-label fw-bold") }}
+            {{ form.type.label(class = "form-label fw-bold") }}
             <br />
-            {{ form.nom_real() }}
+            {{ form.type() }}
+        </div>
+        <br />
+        <div>
+            {{ form.word.label(class = "form-label fw-bold") }}
+            <br />
+            {{ form.word() }}
         </div>
         <br />
         <div>
@@ -40,20 +47,10 @@
     </form>
 
     <!-- Partie affichage des résultats -->
-    {% if  reals != [] %}
-        <ul>
-        {% for real in reals %}
-            <li>
-                Nom et prénom du réalisateur : {{ real.nom }} {{ real.prenom }}
-                <ul>
-                    <li> Nombre de films réalisés : {{ real.films.count()}}</li>
-                    <li> <a href="/films_realisateur/{{ real.id }}">Voir ses films réalisés</a></li>
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-        
+     {{films_titre_genre }}
+     {% if films_titre_genre != [] %}
+        {{ afficher_resultat_films(films_titre_genre, type_data, word_data) }}
+     {% endif %}
  </body>
 
 </html>

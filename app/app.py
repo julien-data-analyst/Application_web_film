@@ -7,12 +7,12 @@
 # Chargement des librairies
 import os
 from config import app
-from modele_bdd import db, Genre, Film, Directeur, Langage, film_langages, film_genres # Toutes les tables et relations
+from modele_bdd import db, Genre, Film, Directeur, Language, film_languages, film_genres # Toutes les tables et relations
 from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_graph, \
                         films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
                         top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
                         top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
-                        top_10_realisateur, rech_films
+                        top_10_realisateur, rech_films, rech_genres
 
 from formulaire_real import RealForm, TitGenForm
 from sqlalchemy.sql import insert
@@ -100,17 +100,17 @@ def recherche_realisateur():
 @app.route('/rech_film', methods=["GET", "POST"])
 def recherche():
     form = TitGenForm()
+    result = []
+    type_data = ""
+    word_data = ""
 
     if form.validate_on_submit():
 
-        type_data = form.type.data # "Genre" /ou/ "Titre / Mot(s) clé(s)"
+        type_data = form.type.data # "Genre" /ou/ "Titre"
         word_data = form.word.data # ZONE DE TEXTE
-
-        #print(typeR) # ok!
-        #print(wordR) # ok!
         
         if type_data == "Genre" :
-            result = rech_films(word_data, Genre, Genre.genre)
+            result = rech_genres(word_data)
             mess_inf = "Le genre que vous avez renseigné n'existe pas."
 
         else:
@@ -120,8 +120,11 @@ def recherche():
         if result == []:
             flash(mess_inf)
     
-    return render_template('formulaire_films.html', form=form,
-                           films_titre_genre = result)
+    return render_template('formulaire_films.html', 
+                           form=form,
+                           films_titre_genre = result,
+                           type_data = type_data,
+                           word_data = word_data)
 
 # Création de la route pour afficher les films réalisés par le réalisateur/directeur
 @app.route("/films_realisateur/<id_dir>")
@@ -181,6 +184,8 @@ if __name__ == "__main__":
         # Ajout d'instances
         new_genre = Genre(genre="drama")
         new_genre_2 = Genre(genre="action")
+        new_genre_3 = Genre(genre="dramaturge")
+
         new_film = Film(title="Film", vote_count=15000,
                         vote_average = 10,
                         popularity = 0.5, 
@@ -212,9 +217,10 @@ if __name__ == "__main__":
                         budget = 50,
                         revenue = 80)
         new_film_6 = Film(title="Popularity", vote_count=0, release_date = datetime.datetime.strptime("2023-03-14", "%Y-%m-%d"))
-        new_langage = Langage(langage="French")
-        new_langage_2 = Langage(langage="Allemand")
-        new_langage_3 = Langage(langage="Espagnol")
+
+        new_langage = Language(langage="French")
+        new_langage_2 = Language(langage="Allemand")
+        new_langage_3 = Language(langage="Espagnol")
 
         # Pour les directeurs
         new_dir = Directeur(nom="Dir", prenom='Dir')
@@ -223,8 +229,8 @@ if __name__ == "__main__":
 
         # Ajout du lien entre Genre et Film
         new_genre.films.extend([new_film])
-        new_film.genres.extend([new_genre_2])
-
+        new_film.genres.extend([new_genre_2, new_genre_3])
+        new_film_2.genres.extend([new_genre_3])
         new_dir.films.extend([new_film, new_film_2])
         new_dir_2.films.extend([new_film_3, new_film_4, new_film_5])
         new_dir_3.films.extend([new_film_6])
@@ -232,57 +238,58 @@ if __name__ == "__main__":
         db.session.add_all([new_langage, new_film, new_film_2, new_film_3,
                             new_langage_2, new_langage_3, 
                             new_genre, new_genre_2, new_dir,
-                            new_film_4, new_film_5, new_film_6])
+                            new_film_4, new_film_5, new_film_6,
+                            new_genre_3])
         db.session.commit()
         # Ajout du lien entre Film et langage (obligée car on ne peut pas rajouter d'attributs avec extend)
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film.id,
-            id_langage=new_langage.id
+            id_language=new_langage.id
         )
         )
 
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film.id,
-            id_langage=new_langage_2.id
+            id_language=new_langage_2.id
         )
         )
 
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film.id,
-            id_langage=new_langage_3.id
+            id_language=new_langage_3.id
         )
         )
 
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film_2.id,
-            id_langage=new_langage_2.id
+            id_language=new_langage_2.id
         )
         )
 
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film_3.id,
-            id_langage=new_langage_3.id
+            id_language=new_langage_3.id
         )
         )
     
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film_3.id,
-            id_langage=new_langage.id
+            id_language=new_langage.id
         )
         )
         db.session.commit()
 
         
         db.session.execute(
-        insert(film_langages).values(
+        insert(film_languages).values(
             id_film=new_film_2.id,
-            id_langage=new_langage.id
+            id_language=new_langage.id
         )
         )
     # Lancer l'application Flask
