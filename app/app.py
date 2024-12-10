@@ -216,28 +216,66 @@ def run_notebook(notebook_path, timeout=600):
 
 namespace = run_notebook("./explo.ipynb")
 
-# Access data
+#_______________________ Access data __________________________________ #
 film = namespace["film"]
 genre = namespace["genre"]
 collection = namespace["collection"]
-original_language = namespace["original_language"]
-spoken_languages = namespace["spoken_language"]
+languages = namespace["list_languages"]
 production = namespace["production"]
 actor = namespace["actor"]
 director = namespace["director"]
+# --------------------------------------------------------------------- #
 
-# ---------------------------------------------------- #
+# Insert collection into the db
+# with app.app_context():
+#     for index, row in collection.iterrows():
+#         collection = Collection(id=row["id"], name=row["belongs_to_collection"])
+#         db.session.add(collection)
+#     db.session.commit()
+#     print("Collections data inserted successfully!")
 
-with app.app_context():
-    for index, row in collection.iterrows():
-        collection = Collection(id=row["id"], name=row["belongs_to_collection"])
-        db.session.add(collection)
-    db.session.commit()
-    print("Collections data inserted successfully!")
+# # Insert actors into the db
+# with app.app_context():
+#     for index, row in actor.iterrows():
+#         actor = Acteur(
+#             nom=row["lastname"], 
+#             prenom=row["firstname"], 
+#         )
+#         db.session.add(actor)
+#     db.session.commit()
+#     print("Actors successfully added.")
+
+
+# # Insert directors into the db 
+# with app.app_context():
+#     for index, row in director.iterrows():
+#         director = Directeur(id=row["idfilm"], nom=row["lastname"], prenom=row["firstname"])
+#         db.session.add(director)
+#     db.session.commit()
+#     print("Directors successfully added.")
+
     
+# # Insert genres into the db
+# with app.app_context():
+#     for index, row in genre.iterrows():
+#         genre = Genre(genre=row["genres"])
+#         db.session.add(genre)
+#     db.session.commit()
+#     print("Genre successfully added.")
+    
+# # Insert production companies
+# with app.app_context():
+#     for index, row in production.iterrows():
+#         production = Company(name=row["production_companies"])
+#         db.session.add(production)
+#     db.session.commit()
+#     print("Production companies added.")
+    
+    
+# Insert original languages
 with app.app_context():
-    for index, row in actor.iterrows():
-        actor = Acteur(id=row["id"], name=row["person"])
-        db.session.add(actor)
+    for lang in languages:
+        langss = Language(language = lang)
+        db.session.add(langss)
     db.session.commit()
     print("Actors successfully added.")
