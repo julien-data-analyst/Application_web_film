@@ -18,19 +18,160 @@ from formulaire_real import RealForm, TitGenForm
 from sqlalchemy.sql import insert
 import datetime
 from flask import render_template, jsonify, flash, redirect, url_for, session
-from config import app
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 
 # Attention : se placer dans le dossier app pour tester le programme
 # Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
 
-# ---- Test provisoire sur la création du BDD ----
-db.init_app(app)
+@app.route('/inf', methods=["GET", "POST"])
+def informations():
 
-with app.app_context():
-    db.drop_all()
-    db.create_all()
+    # Application des différentes requêtes SQL pour récupérer les informations
+
+    # ---- Les indicateurs ----
+    annee_plus_prod = annee_plus_productive()
+    total_budg_rec = total_budget_recette()
+    genre_max = max_films_genre()
+    
+    # ---- Les top 10 ----
+    r_top_10_mieux_notes = top_10_mieux_notes()
+    r_top_10_plus_votes = top_10_plus_votes()
+    r_top_10_plus_populaires = top_10_plus_populaires()
+    r_top_10_plus_cher = top_10_plus_cher()
+    r_top_10_plus_long = top_10_plus_long()
+    r_top_10_plus_court = top_10_plus_court()
+    r_top_10_plus_deficit = top_10_plus_deficit()
+    r_top_10_plus_rentable = top_10_plus_rentables()
+    r_top_10_real_film = top_10_realisateur()
+
+    return render_template("page_test_req.html",
+                           annee_plus_prod = annee_plus_prod,
+                           total_budg_rec = total_budg_rec,
+                           genre_max = genre_max,
+                           r_top_10_mieux_notes =  r_top_10_mieux_notes,
+                           r_top_10_plus_cher = r_top_10_plus_cher,
+                           r_top_10_plus_court = r_top_10_plus_court,
+                           r_top_10_plus_long = r_top_10_plus_long,
+                           r_top_10_plus_deficit = r_top_10_plus_deficit,
+                           r_top_10_plus_votes = r_top_10_plus_votes,
+                           r_top_10_plus_populaires = r_top_10_plus_populaires,
+                           r_top_10_plus_rentable = r_top_10_plus_rentable,
+                           r_top_10_real_film = r_top_10_real_film # [(nom_directeur, prenom_directeur, effectif)]
+                           )
+
+#################################
+# Création de la page du formulaire pour la recherche de réalisateur
+#################################
+@app.route('/rech_real', methods=["GET", "POST"])
+def recherche_realisateur():
+    # Pour le formulaire
+    form = RealForm()
+
+    # ---- Les top 10 ----
+    r_top_10_mieux_notes = top_10_mieux_notes()
+    r_top_10_plus_populaires = top_10_plus_populaires()
+    r_top_10_real_film = top_10_realisateur()
+    reals=[]
+
+    if form.validate_on_submit():
+        # Récupération de la recherche de l'utilisateur après validation de la demande
+        nom_real = form.nom_real.data
+        #print(nom_real)
+        
+        reals = rech_films(nom_real, Directeur, Directeur.nom)
+
+        if reals == []:
+            # Message d'attention à l'utilisateur sur la non trouvaille du nom
+            flash("Nous n'avons pas pu trouvé de réalisateurs correspondant à votre recherche")
+
+            # Retour du formulaire sans la possibilité de renvoyer les données envoyées
+            return redirect(url_for('recherche_realisateur'))
+
+        
+    return render_template("realisateur.html",
+                           form = form,
+                           reals = reals,
+                           r_top_10_mieux_notes =  r_top_10_mieux_notes,
+                           r_top_10_plus_populaires = r_top_10_plus_populaires,
+                           r_top_10_real_film = r_top_10_real_film)
+
+#################################
+# Création de la page du formulaire pour la recherche de films par genre/titre
+#################################
+@app.route('/rech_film', methods=["GET", "POST"])
+def recherche():
+    form = TitGenForm()
+    result = []
+    type_data = ""
+    word_data = ""
+
+    if form.validate_on_submit():
+
+        type_data = form.type.data # "Genre" /ou/ "Titre"
+        word_data = form.word.data # ZONE DE TEXTE
+        
+        if type_data == "Genre" :
+            result = rech_genres(word_data)
+            mess_inf = "Le genre que vous avez renseigné n'existe pas."
+
+        else:
+            result = rech_films(word_data, Film, Film.title)
+            mess_inf = "Le titre que vous avez renseigné n'existe pas."
+
+        if result == []:
+            flash(mess_inf)
+    
+    return render_template('formulaire_films.html', 
+                           form=form,
+                           films_titre_genre = result,
+                           type_data = type_data,
+                           word_data = word_data)
+
+# Création de la route pour afficher les films réalisés par le réalisateur/directeur
+@app.route("/films_realisateur/<id_dir>")
+def aff_film(id_dir):
+
+    # Recherche SQL sur les films réalisés par ce directeur
+    resultat = Directeur.query.filter(Directeur.id == id_dir).first()
+
+    return render_template("realisateur_films.html",
+                           films_real = resultat)
+
+##################################
+# Création des routes spécifiques pour la Data 
+# JSON avec Fetch 
+##################################
+
+# Pour le nombre de films par genre
+@app.route('/api/data/films_par_genre')
+def get_data_genre():
+    result = films_par_genre()
+
+    return jsonify(result)
+
+# Pour le nombre de films par langue
+@app.route('/api/data/films_par_langue')
+def get_data_langue():
+    result = films_par_langue()
+
+    return jsonify(result)
+
+# Pour le nombre de films par année
+@app.route('/api/data/films_par_annee')
+def get_data_annee():
+    result = films_par_annee()
+
+    return jsonify(result)
+
+#####################################
+# Création des filtrages personnalisés
+#####################################
+def extract_year(date_year):
+    date_year = str(date_year)
+    year = date_year.split("-")[0]
+
+    return year
 
 #___________________________________________________________________ #
 # Chargement des données préparées.
@@ -75,6 +216,10 @@ production = namespace["list_production"]
 actor = namespace["list_actors"]
 director = namespace["list_directors"]
 # --------------------------------------------------------------------- #
+
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
 # Insert collection into the db
 with app.app_context():
@@ -129,3 +274,6 @@ with app.app_context():
         db.session.add(langss)
     db.session.commit()
     print("Languages added.") 
+
+if __name__ == '__main__':
+    app.run(debug=True)
