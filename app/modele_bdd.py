@@ -10,11 +10,11 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 #########################################
-### Créer les colonnes des tables ####
+### Define the database models ###
 ########################################
 
 ##############################
-# ---- Pour la table Film ----
+# ---- Film Table ----
 ##############################
 class Film(db.Model):
     """
@@ -43,16 +43,17 @@ class Film(db.Model):
     - acteurs : permet de voir les acteurs associés au film en question
     - langages : permet de voir les langues disponibles du film en question
     """
-    __tablename__= "films" # Nom de la table dans la BDD SQLite
+    __tablename__ = "films"  # Table name in SQLite
 
-    # Création des différentes colonnes
-    # La clé primaire : id
-    id = db.Column(db.Integer, primary_key=True) 
+    # Primary key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     title = db.Column(db.String(100), nullable=False)
     release_date = db.Column(db.Date)
     popularity = db.Column(db.Float)
     runtime = db.Column(db.Float)
-    budget = db.Column(db.Float)    
+    budget = db.Column(db.Float)
     revenue = db.Column(db.Float)
     tagline = db.Column(db.Text)
     overwiew = db.Column(db.Text)
@@ -60,9 +61,23 @@ class Film(db.Model):
     vote_count = db.Column(db.Integer, nullable=False)
     vote_average = db.Column(db.Float)
 
-    # Création des clés étrangères
-    id_directeur = db.Column(db.Integer, 
-                             db.ForeignKey("directeurs.id"))
+    # Foreign keys
+    id_directeur = db.Column(db.Integer, db.ForeignKey("directeurs.id"))
+    id_collection = db.Column(db.Integer, db.ForeignKey("collections.id"))
+
+    # Relationships
+    genres = db.relationship(
+        'Genre', secondary="film_genres", backref="films"
+    )
+    companies = db.relationship(
+        'Company', secondary="film_companies", backref="films"
+    )
+    acteurs = db.relationship(
+        'Acteur', secondary="film_acteurs", backref="films"
+    )
+
+    # Define the relationship to the Collection model
+    collection = db.relationship("Collection", back_populates="films")
 
     id_collection = db.Column(db.Integer,
                               db.ForeignKey("collections.id"))
@@ -92,7 +107,7 @@ class Film(db.Model):
                              lazy="dynamic")
     
 ##############################
-# ---- Pour la table Directeur ----
+# ---- Directeur Table ----
 ##############################
 class Directeur(db.Model):
     """
@@ -104,10 +119,11 @@ class Directeur(db.Model):
     """
 
     __tablename__ = "directeurs"
-    
-    # Création des différentes colonnes
-    # La clé primaire : id
+
+    # Primary key
     id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     nom = db.Column(db.String(70), nullable=False)
     prenom = db.Column(db.String(70), nullable=False)
 
@@ -116,7 +132,7 @@ class Directeur(db.Model):
     lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
-# ---- Pour la table Genre ----
+# ---- Genre Table ----
 ##############################
 class Genre(db.Model):
     """
@@ -126,14 +142,16 @@ class Genre(db.Model):
     - genre : le genre associé
     """
     __tablename__ = "genres"
-    
-    # Création des différentes colonnes
-    # La clé primaire : id
+
+    # Primary key
     id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     genre = db.Column(db.String(20), nullable=False)
 
+
 ##############################
-# ---- Pour la table Collection ----
+# ---- Collection Table ----
 ##############################
 class Collection(db.Model):
     """
@@ -147,6 +165,8 @@ class Collection(db.Model):
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     name = db.Column(db.String(90), nullable=False)
 
     # Création de la relation avec la clé étrangère (1-*)
@@ -154,7 +174,7 @@ class Collection(db.Model):
     lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
-# ---- Pour la table Acteur ----
+# ---- Acteur Table ----
 ##############################
 class Acteur(db.Model):
     """
@@ -169,6 +189,8 @@ class Acteur(db.Model):
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     nom = db.Column(db.String(70), nullable=False)
     prenom = db.Column(db.String(70), nullable=False)
 
@@ -188,14 +210,16 @@ class Language(db.Model):
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
-    langage = db.Column(db.String(50), nullable=False)
+
+    # Columns
+    language = db.Column(db.String(50), nullable=False)
 
     # Création de la relation avec la clé étrangère (1-*)
     films_org = db.relationship('Film', backref = 'language_org',
     lazy = 'dynamic') # Modif au niveau du backref car on ne peut pas mettre le même nom plusieurs fois
 
 ##############################
-# ---- Pour la table Production_Company ----
+# ---- Production Company Table ----
 ##############################
 class Company(db.Model):
     """
@@ -209,43 +233,34 @@ class Company(db.Model):
     # Création des différentes colonnes
     # La clé primaire : id
     id = db.Column(db.Integer, primary_key=True)
+
+    # Columns
     name = db.Column(db.String(150), nullable=False)
 
+
 ##############################
-# ---- Création des tables d'associations (*-*) ----
+# ---- Association Tables ----
 ##############################
 
-# Pour Film et Genre
+# Association table for Film and Genre
 film_genres = db.Table(
     'film_genres',
-
-    db.Column('id_film', db.Integer,
-              db.ForeignKey("films.id"), primary_key=True),
-    
-    db.Column('id_genres', db.Integer,
-              db.ForeignKey('genres.id'), primary_key=True)
+    db.Column('id_film', db.Integer, db.ForeignKey("films.id"), primary_key=True),
+    db.Column('id_genres', db.Integer, db.ForeignKey("genres.id"), primary_key=True)
 )
 
-# Pour Film et Companie
+# Association table for Film and Company
 film_companies = db.Table(
     'film_companies',
-
-    db.Column('id_film', db.Integer,
-              db.ForeignKey("films.id"), primary_key=True),
-    
-    db.Column('id_companies', db.Integer,
-              db.ForeignKey('companies.id'), primary_key=True)
+    db.Column('id_film', db.Integer, db.ForeignKey("films.id"), primary_key=True),
+    db.Column('id_companies', db.Integer, db.ForeignKey("companies.id"), primary_key=True)
 )
 
-# Pour Film et Acteur
+# Association table for Film and Acteur
 film_acteurs = db.Table(
     'film_acteurs',
-
-    db.Column('id_film', db.Integer,
-              db.ForeignKey("films.id"), primary_key=True),
-    
-    db.Column('id_acteur', db.Integer,
-              db.ForeignKey('acteurs.id'), primary_key=True)
+    db.Column('id_film', db.Integer, db.ForeignKey("films.id"), primary_key=True),
+    db.Column('id_acteur', db.Integer, db.ForeignKey("acteurs.id"), primary_key=True)
 )
 
 # Pour Film et Langage
