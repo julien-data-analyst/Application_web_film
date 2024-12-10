@@ -1,0 +1,161 @@
+
+#diamond-background {
+    position: fixed;  /* Ensure the background stays fixed while scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f8f8f7;  /* The background color of the page */
+    z-index: -1;  /* Ensure it stays behind the content */
+    animation: 2s cubic-bezier(.25, 1, .30, 1) wipe-in-bottom-right both;
+  }
+  
+  
+  
+  @keyframes wipe-in-bottom-right {
+    from {
+      clip-path: polygon(0 0, 0 0, 0 0, 0 50%);
+    }
+    to {
+      clip-path: polygon(-50% 0%, 200% 0, 0 200%, 0 -50%);
+    }
+  }
+  
+  
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    background-color: #f8f8f7;  
+    /* display: flex; */
+     justify-content: center; 
+     align-items: flex-start; 
+    overflow-y: auto;
+    padding-top: 80px;
+  }
+  
+  /* Centering content and styling the form container */
+  .container {
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    border-radius: 18px;        
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    margin-top: 20px;
+    opacity: 0.96;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .container:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Navigation Bar Styling */
+  #nabar {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  /* Navbar Links */
+  .navbar-nav .nav-link {
+    color: #333;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    color: #0071e3;  
+    background-color: rgba(0, 113, 227, 0.1);
+  }
+  
+  /* Page Title Styling */
+  h1 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    opacity: 0.85;
+  }
+  
+  /* Form Group and Input Styling */
+  .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 16px;
+    background-color: #f8f8f7;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #0071e3;
+    box-shadow: 0 0 5px rgba(0, 113, 227, 0.2);
+  }
+  
+  /* Button Styling */
+  button#add {
+    padding: 12px 30px;
+    background-color: #0071e3;  
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  button#add:hover {
+    background-color: #005bb5;  
+    transform: translateY(-2px);  
+  }
+  
+  button#add:active {
+    transform: translateY(1px);  
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+  
+    h1 {
+        font-size: 22px;
+    }
+  
+    .form-control {
+        padding: 10px;
+    }
+  
+    button#add {
+        padding: 10px 20px;
+    }
+  }
+  

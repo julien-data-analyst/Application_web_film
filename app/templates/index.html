@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title >SAE Analyse et conception d'un outil décisionnel</title>
+</head>
+
+<body id= 'diamond-background'class="transition-style" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2);">
+    {% extends "base.html" %}
+    <br>
+    {% block content %}
+    {{ super() }}
+    <h1 class="row justify-content-center align-items-center" >Présentation de l'outil décisionnel</h1>
+
+    <div  class="container mt-5 pt-5">
+    
+        <h2>Expliquation technique</h2>
+
+        <h2>Expliquation travail de l'equipe</h2>
+        <br>
+
+            <ul >  
+                <li>Lyop : Mise en place du traitement et de l'insertion des données</li>
+                <li>Ryan : Création de la documentation UML et du schéma de la base de données</li>
+                <li>Julien : Mise en place du serveur Flask et des fonctionnalités nécessaires pour la SAE</li>
+                <li>Gabriel : Développement Front-end  HTML/CSS/JS </li>
+            </ul>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+     {% endblock %}
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body id= 'diamond-background'class="transition-style" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2);">
+    {% extends "base.html" %}
+
+    {% block content %}
+
+
+    {{ super() }}
+        
+        <div class="container mt-5 pt-5">
+        <h1>Répartition des films selon les différents critères</h1>
+         <h2>Nombre de films par genres</h2>
+            <br>
+            <div><canvas id="myChart"></canvas></div>
+            <br>
+         <h2>Nombre de films pour les 20 langues les plus utilisées</h2>
+            <br>
+            <div><canvas id="myChart2"></canvas></div>
+            <br>
+         <h2>Nombre de films par année (limité au 20 dernières années)</h2>
+         <br>
+         <div><canvas id="myChart3"></canvas></div>
+         <br>
+
+        </div>
+        <div class="container mt-5 pt-5">
+            <h1>Statistiques financières</h1>
+                <h2>Les films les mieux notés</h2>
+                
+                <h2>Les films les plus votés </h2>
+               
+                <h2>Les films les plus populaires</h2>
+        </div>
+        <div class="container mt-5 pt-5">
+            <h1>Statistiques sur les votes</h1>
+                <h2>Les films les mieux notés (selon la moyenne des votes).</h2>
+                
+                <h2>Les films les plus votés (selon le nombre total de votes)</h2>
+               
+                <h2>Les films les plus populaires (selon l’indice de popularité)</h2>
+        </div>
+        <div class="container mt-5 pt-5">
+            <h1>Statistiques sur les durées</h1>
+                <h2>Les dix films les plus longs (en termes de durée)</h2>
+                
+                <h2>Les dix films les plus courts</h2>
+               
+        </div>
+        <div class="container mt-5 pt-5">
+            <h1>Formulaire de recherche de films</h1>
+               
+               
+        </div>
+
+
+
+
+
+
+
+    {% endblock %}
+</body>
+</html>
