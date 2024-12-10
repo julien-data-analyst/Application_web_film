@@ -81,9 +81,9 @@ class Film(db.Model):
                              backref='films',
                              lazy = 'dynamic')
     
-    acteurs = db.relationship('Acteur',
-                             secondary="film_acteurs",
-                             backref='films',
+    directeurs = db.relationship('Directeur',
+                             secondary="film_directeurs",
+                             backref='directed_films',
                              lazy="dynamic")
     
     languages = db.relationship('Language',
@@ -149,7 +149,7 @@ class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Columns
-    name = db.Column(db.String(90), nullable=False)
+    name = db.Column(db.String(90))
 
     # Création de la relation avec la clé étrangère (1-*)
     films = db.relationship('Film', backref = 'collection',
@@ -244,15 +244,15 @@ film_companies = db.Table(
               db.ForeignKey('companies.id'), primary_key=True)
 )
 
-# Pour Film et Acteur
-film_acteurs = db.Table(
-    'film_acteurs',
+# Pour Film et Director
+film_directeurs = db.Table(
+    'film_directeurs',
 
     db.Column('id_film', db.Integer,
               db.ForeignKey("films.id"), primary_key=True),
     
-    db.Column('id_acteur', db.Integer,
-              db.ForeignKey('acteurs.id'), primary_key=True)
+    db.Column('id_directeur', db.Integer,
+              db.ForeignKey('directeurs.id'), primary_key=True)
 )
 
 # Pour Film et Language
