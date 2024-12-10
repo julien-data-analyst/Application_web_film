@@ -12,9 +12,9 @@ from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_gr
                         films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
                         top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
                         top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
-                        top_10_realisateur, rech_real
+                        top_10_realisateur, rech_films
 
-from formulaire_real import RealForm
+from formulaire_real import RealForm, TitGenForm
 from sqlalchemy.sql import insert
 import datetime
 from flask import render_template, jsonify, flash, redirect, url_for, session
@@ -76,7 +76,8 @@ def recherche_realisateur():
         # Récupération de la recherche de l'utilisateur après validation de la demande
         nom_real = form.nom_real.data
         #print(nom_real)
-        reals = rech_real(nom_real)
+        
+        reals = rech_films(nom_real, Directeur, Directeur.nom)
 
         if reals == []:
             # Message d'attention à l'utilisateur sur la non trouvaille du nom
@@ -93,6 +94,35 @@ def recherche_realisateur():
                            r_top_10_plus_populaires = r_top_10_plus_populaires,
                            r_top_10_real_film = r_top_10_real_film)
 
+#################################
+# Création de la page du formulaire pour la recherche de films par genre/titre
+#################################
+@app.route('/rech_film', methods=["GET", "POST"])
+def recherche():
+    form = TitGenForm()
+
+    if form.validate_on_submit():
+
+        type_data = form.type.data # "Genre" /ou/ "Titre / Mot(s) clé(s)"
+        word_data = form.word.data # ZONE DE TEXTE
+
+        #print(typeR) # ok!
+        #print(wordR) # ok!
+        
+        if type_data == "Genre" :
+            result = rech_films(word_data, Genre, Genre.genre)
+            mess_inf = "Le genre que vous avez renseigné n'existe pas."
+
+        else:
+            result = rech_films(word_data, Film, Film.title)
+            mess_inf = "Le titre que vous avez renseigné n'existe pas."
+
+        if result == []:
+            flash(mess_inf)
+    
+    return render_template('formulaire_films.html', form=form,
+                           films_titre_genre = result)
+
 # Création de la route pour afficher les films réalisés par le réalisateur/directeur
 @app.route("/films_realisateur/<id_dir>")
 def aff_film(id_dir):
@@ -102,6 +132,7 @@ def aff_film(id_dir):
 
     return render_template("realisateur_films.html",
                            films_real = resultat)
+
 ##################################
 # Création des routes spécifiques pour la Data 
 # JSON avec Fetch 
@@ -128,6 +159,16 @@ def get_data_annee():
 
     return jsonify(result)
 
+#####################################
+# Création des filtrages personnalisés
+#####################################
+def extract_year(date_year):
+    date_year = str(date_year)
+    year = date_year.split("-")[0]
+
+    return year
+
+#app.jinja_env.filters[""]
 # Test de l'application
 if __name__ == "__main__":
     # Exemple d'initialisation de la base de données
@@ -197,48 +238,42 @@ if __name__ == "__main__":
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film.id,
-            id_langage=new_langage.id,
-            original=True  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage.id
         )
         )
 
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film.id,
-            id_langage=new_langage_2.id,
-            original=False  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage_2.id
         )
         )
 
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film.id,
-            id_langage=new_langage_3.id,
-            original=False  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage_3.id
         )
         )
 
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film_2.id,
-            id_langage=new_langage_2.id,
-            original=True  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage_2.id
         )
         )
 
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film_3.id,
-            id_langage=new_langage_3.id,
-            original=True  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage_3.id
         )
         )
     
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film_3.id,
-            id_langage=new_langage.id,
-            original=True  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage.id
         )
         )
         db.session.commit()
@@ -247,8 +282,7 @@ if __name__ == "__main__":
         db.session.execute(
         insert(film_langages).values(
             id_film=new_film_2.id,
-            id_langage=new_langage.id,
-            original=True  # Ajouter la valeur pour la colonne supplémentaire
+            id_langage=new_langage.id
         )
         )
     # Lancer l'application Flask

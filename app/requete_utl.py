@@ -397,19 +397,21 @@ def top_10_realisateur():
     return result_f_r
 
 # Pour la recherche dans le formulaire
-def rech_real(nom_real):
+def rech_films(nom, table, colonne):
     """
     Fonction : rechercher les réalisateurs qui ont ce nom partiellement ou égale.
     Argument : 
-    - nom_real : nom du réalisateur
+    - nom : valeur recherchée
+    - table : nom de la table où tu vas chercher
+    - colonne : colonne concernée
 
     Retour :
-    - une liste d'instance de directeur dont le nom correspond partiellement à celui demandé
+    - une liste d'instance dont le nom correspond partiellement à celui demandé
     """
 
     # Application de la requête SQL (vérifier s'il on doit faire sur le prénom aussi (condition de ou à ajouter dans ces cas là))
-    search = "%{}%".format(nom_real)
-    results = Directeur.query.filter(Directeur.nom.like(search)).all()
+    search = "%{}%".format(nom) # Ce qui donne "%nom%"
+    results = table.query.filter(colonne.like(search)).all() # On récupère toutes les lignes qui contient ce sous-chaîne de caractère
 
     return results
 

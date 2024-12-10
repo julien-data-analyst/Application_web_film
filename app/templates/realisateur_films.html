@@ -8,6 +8,7 @@
     <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
   </head>
   <body>
+    {% from "_macro_resultat_film.html" import afficher_resultat_films %}
     <!-- Partie messagerie -->
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -21,25 +22,10 @@
                         {{ message }}
                         </div>
                     {% endfor %}
-                {% endif %}
-            {% endwith %}
-    
+    {% endif %}
+    {% endwith %}
     <!-- Partie films réalisés -->
-     <h2> Les films réalisés par le directeur {{ films_real.nom }} {{ films_real.prenom }} : </h2>
-     <ul>
-     {% for film in films_real.films %}
-        <li>Titre du film : {{ film.title }}</li>
-        <ul>
-        <li>Son résumé : <p>{{ film.overwiew }}</p></li>
-        <li>Ses acteurs : {{ film.acteurs[0] }}</li>
-        <li>Sa date de sortie : {{ film.release_date }}</li>
-        <!-- Compléter pour langue d'origine-->
-        <li>Sa note moyenne : {{ film.vote_average }}</li>
-        <li>L'indice de popularité de ce film : {{ film.popularity }}</li>
-        </ul>
-        <br />
-     {% endfor %}
-    </ul>   
- </body>
+    {{ afficher_resultat_films(films_real.films, "dir", films_real) }}
+    </body>
 
 </html>

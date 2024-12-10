@@ -250,7 +250,5 @@ film_langages = db.Table(
               db.ForeignKey("films.id"), primary_key=True),
     
     db.Column('id_langage', db.Integer,
-              db.ForeignKey('langages.id'), primary_key=True),
-    
-    db.Column('original', db.Boolean, nullable=False)
+              db.ForeignKey('langages.id'), primary_key=True)
 )
