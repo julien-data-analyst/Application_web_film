@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if (ctx) {
       new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
           labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
           datasets: [{
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if (ctx2) {
       new Chart(ctx2, {
-        type: 'bar',
+        type: 'pie',
         data: {
           labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
           datasets: [{
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if (ctx3) {
       new Chart(ctx3, {
-        type: 'bar',
+        type: 'pie',
         data: {
           labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
           datasets: [{
