@@ -81,16 +81,16 @@ class Film(db.Model):
                              backref='films',
                              lazy = 'dynamic')
     
-    directeurs = db.relationship('Directeur',
-                             secondary="film_directeurs",
-                             backref='directed_films',
+    acteurs = db.relationship('Acteur',
+                             secondary="film_acteurs",
+                             backref='acted_films',
                              lazy="dynamic")
     
     languages = db.relationship('Language',
                              secondary="film_languages",
                              backref='films',
                              lazy="dynamic")
-    
+        
 ##############################
 # ---- Pour la table Directeur ----
 ##############################
@@ -244,15 +244,15 @@ film_companies = db.Table(
               db.ForeignKey('companies.id'), primary_key=True)
 )
 
-# Pour Film et Director
-film_directeurs = db.Table(
-    'film_directeurs',
+# Pour Film et Acteur
+film_acteurs = db.Table(
+    'film_acteurs',
 
     db.Column('id_film', db.Integer,
               db.ForeignKey("films.id"), primary_key=True),
     
-    db.Column('id_directeur', db.Integer,
-              db.ForeignKey('directeurs.id'), primary_key=True)
+    db.Column('id_acteur', db.Integer,
+              db.ForeignKey('acteurs.id'), primary_key=True)
 )
 
 # Pour Film et Language

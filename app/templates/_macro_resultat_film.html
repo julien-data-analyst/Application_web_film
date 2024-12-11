@@ -16,23 +16,54 @@
 {% if type == "dir" %}
 <h2> Les films réalisés par le directeur {{ valeur.nom }} {{ valeur.prenom }} : </h2>
 {% elif type == "Genre" %}
-<h2> Films du genre "{{ valeur }}" </h2>
+<h2> Films du genre "{{ valeur }}" : </h2>
 {% else %}
-<h2> Films du titre "{{ valeur }}"</h2>
+<h2> Films du titre "{{ valeur }}" : </h2>
 {% endif %}
      <ul>
      {% for film in films %}
         <li>Titre du film : {{ film.title }}</li>
         <ul>
             <!-- Les informations du film concerné -->
+            {% if film.overwiew==None %}
+            <li> Pas de résumé du film </li>
+            {% else %}
             <li>Son résumé : <p>{{ film.overwiew }}</p></li>
-            {% if type != "dir" %}
-                <li>Son réalisateur : {{ film.directeur }}</li>
             {% endif %}
-            <li>Ses acteurs : {{ film.acteurs[0] }}</li> <!-- À modifier plus tard -->
-            <li>Sa date de sortie : {{ film.release_date }}</li> <!-- N'avoir que l'année de sortie -->
+            
+            {% if type != "dir" %}
+                <li>Son réalisateur : {{ film.directeur.nom }} {{ film.directeur.prenom }}</li>
+            {% endif %}
+            
+            <!-- Parcourir tous ses acteurs -->
+            <li>Ses acteurs : 
+                <ul>
+                {% for acteur in film.acteurs %}
+                    <li>
+                        {% if acteur.nom != None %} 
+                            {{ acteur.nom }} 
+                        {% endif %}
+                        {% if acteur.prenom != None %}
+                            {{ acteur.prenom }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </li> 
+            
+         
+            
+            <li>Son année de sortie : {{ film.release_date | extract_year }}</li>
+
             <!-- Compléter pour langue d'origine-->
-            <li>Sa note moyenne : {{ film.vote_average }}</li>
+            <li>Sa langue originale : {{ film.language_org.language }}</li>
+            
+            {% if film.vote_average==None %}
+                <li>Sa note moyenne : Note inexistante (pas de vote)</li>
+            {% else %}
+                <li>Sa note moyenne : {{ film.vote_average }}</li>
+            {% endif %}
+            
             <li>L'indice de popularité de ce film : {{ film.popularity }}</li>
         </ul>
         <br />

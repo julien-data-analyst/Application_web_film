@@ -100,7 +100,6 @@ def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter
      - add_filter : valeur booléenne disant si on doit ajouter un filtre à notre requête SQL
      - filter : filtrage SQL à faire
      ça peut concerner aussi une colonne numérique dans la table Film.
-
      
      Retour :
      Résultat de la requête SQL (Liste de tuples ou d'un tuple selon la limit)
@@ -192,7 +191,7 @@ def films_par_langue():
 
     # Application de la requête SQL
     result_f_par_l = req_joint_par_crit(
-        Language, Language.langage, 
+        Language, Language.language, 
         film_languages, film_languages.c.id_language,
         limit=20
     )
@@ -396,7 +395,7 @@ def top_10_realisateur():
 
     return result_f_r
 
-# Pour la recherche dans le formulaire
+# Pour la recherche dans les formulaires
 def rech_films(nom, table, colonne):
     """
     Fonction : rechercher les réalisateurs qui ont ce nom partiellement ou égale.
@@ -409,55 +408,46 @@ def rech_films(nom, table, colonne):
     - une liste d'instance dont le nom correspond partiellement à celui demandé
     """
 
-    # Application de la requête SQL (vérifier s'il on doit faire sur le prénom aussi (condition de ou à ajouter dans ces cas là))
-
+    # Application de la requête SQL
     colonne_order_by = Film.release_date
-    search = "%{}%".format(nom) # Ce qui donne "%nom%"
+    search = "{}%".format(nom) # Ce qui donne "%nom%"
 
-    if table == Directeur :
-        results = (table.query
+    results = table.query
+
+    # Pour la jointure de la table Directeur
+    if colonne == Directeur.nom :
+        results = (results
                    .join(Film, Film.id_directeur == Directeur.id)
-                   .filter(colonne.like(search))
-                   .order_by(colonne_order_by)
-                   .all()
                 ) # On récupère toutes les lignes qui contient ce sous-chaîne de caractère
-    elif table == Film :
-        results = (
-            table.query
-            .filter(colonne.like(search))
-            .order_by(colonne_order_by)
-            .all()
-        )
-    else:
+    
+    # Pour la jointure de la table Genre
+    elif colonne == Genre.genre :
        results = (
-               table.query
+               results
                .join(film_genres, Film.id == film_genres.c.id_film)
                .join(Genre, film_genres.c.id_genres == Genre.id)
-               .filter(colonne.like(search))
-               .order_by(colonne_order_by)
-               .all()
                )  
-
-    return results
-
-def rech_genres(name):
-    """
-    Fonction : rechercher les genres qui correspondent (à regarder avec ma fonction "req_joint_par_crit")
-    """
-    table = Film
-    colonne_order_by = Film.release_date
-    colonne_like = Genre.genre
-    search = "%{}%".format(name) 
-
+       
+    # Pour la table 
+    else : 
+        pass
+    
+    results = (results
+            .filter(colonne.like(search))
+            .order_by(-colonne_order_by)
+            )
+    
+    if colonne != Directeur.nom:
+        results = (
+            results
+            .limit(50)
+        )
+    
     results = (
-               table.query
-               .join(film_genres, Film.id == film_genres.c.id_film)
-               .join(Genre, film_genres.c.id_genres == Genre.id)
-               .filter(colonne_like.like(search))
-               .order_by(colonne_order_by)
-               .all()
-               )
-
+        results
+        .all()
+    )
+    
     return results
 
 if __name__=="__main__":
@@ -500,7 +490,9 @@ if __name__=="__main__":
         print("Les réalisateurs des 10 films les mieux notés : "+str(liste_real_not))
         print("Les réalisateurs des 10 films les plus populaires : "+str(liste_real_pop))
 
-        print(rech_genres("dra"))
+        # Les réalisateurs qui ont comme nom Shy
+        print("Les directeurs contenant le nom 'Shy' : " + str(rech_films("Shy", Directeur, Directeur.nom)))
+        print("Les films réalisés avec le genre 'Drama' : " + str(rech_films("Drama", Film, Genre.genre)))
         # Au niveau de la recherche des directeurs
         #print("Les directeurs possédant le nom 'Dir' : " + str(rech_films("Dir5")))
         #print("Le nombre de films du premier directeur dans la fonction de recherche : " + str(rech_real("Dir")[0].films.count()))

@@ -5,7 +5,7 @@
 #################################################
 
 # Chargement des librairies 
-from flask import Flask ,request , render_template
+from flask import Flask
 import secrets
 
 # Lancement de l'application (pour le moment que la BDD)

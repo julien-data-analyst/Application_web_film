@@ -47,7 +47,6 @@
     </form>
 
     <!-- Partie affichage des résultats -->
-     {{films_titre_genre }}
      {% if films_titre_genre != [] %}
         {{ afficher_resultat_films(films_titre_genre, type_data, word_data) }}
      {% endif %}
