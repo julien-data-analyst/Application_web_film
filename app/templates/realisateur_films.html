@@ -2,12 +2,22 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Test de récupération des informations</title>
+    <title>Récupération des informations</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
+ 
   </head>
-  <body>
+  <body id= 'diamond-background'class="transition-style" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2);" >
+
+    {% extends 'base.html' %}
+
+    {% block content %}
+    {{ super() }}
+
     {% from "_macro_resultat_film.html" import afficher_resultat_films %}
     <!-- Partie messagerie -->
     {% with messages = get_flashed_messages() %}
@@ -25,7 +35,13 @@
     {% endif %}
     {% endwith %}
     <!-- Partie films réalisés -->
-    {{ afficher_resultat_films(films_real.films, "dir", films_real) }}
-    </body>
+
+   <div class="container mt-5 pt-5" >
+      <p> {{ afficher_resultat_films(films_real.films, "dir", films_real) }} </p>
+   </div>
+    {% endblock %}
+  
+  
+  </body>
 
 </html>

@@ -27,8 +27,8 @@ from nbconvert.preprocessors import ExecutePreprocessor
 # Attention : se placer dans le dossier app pour tester le programme
 # Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
 
-@app.route('/inf', methods=["GET", "POST"])
-def informations():
+@app.route('/film', methods=["GET", "POST"])
+def film():
 
     # Application des différentes requêtes SQL pour récupérer les informations
 
@@ -48,7 +48,7 @@ def informations():
     r_top_10_plus_rentable = top_10_plus_rentables()
     r_top_10_real_film = top_10_realisateur()
 
-    return render_template("page_test_req.html",
+    return render_template("film.html",
                            annee_plus_prod = annee_plus_prod,
                            total_budg_rec = total_budg_rec,
                            genre_max = genre_max,
@@ -63,11 +63,24 @@ def informations():
                            r_top_10_real_film = r_top_10_real_film # [(nom_directeur, prenom_directeur, effectif)]
                            )
 
+
+
+
+@app.route('/index',methods = ['GET', 'POST'])
+
+def index():
+    return render_template('index.html')
+
+
+
+
+
+
 #################################
 # Création de la page du formulaire pour la recherche de réalisateur
 #################################
-@app.route('/rech_real', methods=["GET", "POST"])
-def recherche_realisateur():
+@app.route('/acteur_réa', methods=["GET", "POST"])
+def acteur_réa():
     # Pour le formulaire
     form = RealForm()
 
@@ -92,7 +105,7 @@ def recherche_realisateur():
             return redirect(url_for('recherche_realisateur'))
 
         
-    return render_template("realisateur.html",
+    return render_template("Acteurs_Réalisateurs.html",
                            form = form,
                            reals = reals,
                            r_top_10_mieux_notes =  r_top_10_mieux_notes,
@@ -137,6 +150,8 @@ def recherche():
                            films_titre_genre = result,
                            type_data = type_data,
                            word_data = word_data)
+
+
 
 # Création de la route pour afficher les films réalisés par le réalisateur/directeur
 @app.route("/films_realisateur/<id_dir>")

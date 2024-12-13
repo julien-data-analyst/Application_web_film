@@ -8,9 +8,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Statistiques</title>
 </head>
 <body id= 'diamond-background'class="transition-style" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2);">
     {% extends "base.html" %}
@@ -19,12 +20,98 @@
     {{ super() }}    
     <div class="container  mt-5 pt-5">
         <h1>Statistiques globales</h1>
+        <ul>
+
+            {% for i in r_top_10_mieux_notes %}
+
+            <li> {{ i.title }}  {{ i.vote_count }}</li>
+
+            {% endfor %}
+
+
+        </ul>
+
+        <ul>
+
+            {% for i in r_top_10_plus_populaires %}
+
+            <li> {{ i.title }}  {{ i.vote_count }}</li>
+            
+            {% endfor %}
+
+
+        </ul>
+
+        <ul>
+
+            {% for i in r_top_10_real_film %}
+
+            <li> {{ i.nom }}  {{ i.prenom }}  {{ i[2] }}</li>
+            
+            {% endfor %}
+
+
+        </ul>
+
+
+
     </div>
 
     <div class="container mt-5 pt-5">
         <h1>Formulaire de recherche</h1>
+         <!-- Partie messagerie -->
+     {% with messages = get_flashed_messages() %}
+     {% if messages %}
+         {% for message in messages %}
+             <div class="alert alert-warning">
+               <button type="button" 
+               class="btn-close" 
+               data-bs-dismiss="alert" 
+               aria-label="Close">
+                 </button>
+                         {{ message }}
+                         </div>
+                     {% endfor %}
+                 {% endif %}
+             {% endwith %}
+ 
+     <!-- Partie formulaire -->
+     <form method="POST" >
+         {{ form.csrf_token }}
+ 
+         <div>
+             {{ form.nom_real.label(class = "form-label fw-bold") }}
+             <br />
+             {{ form.nom_real() }}
+         </div>
+         <br />
+         <div>
+             {{ form.envoyer(class='btn btn-primary') }}
+         </div>
+     </form>
+ 
+     <!-- Partie affichage des résultats -->
+     {% if  reals != [] %}
+         <ul>
+         {% for real in reals %}
+             <li>
+                 Nom et prénom du réalisateur : {{ real.nom }} {{ real.prenom }}
+                 <ul>
+                     <li> Nombre de films réalisés : {{ real.films.count()}}</li>
+                     <li> <a href="/films_realisateur/{{ real.id }}">Voir ses films réalisés</a></li>
+                 </ul>
+             </li>
+         {% endfor %}
+         </ul>
+     {% endif %}
 
     </div>
+    
+
+
+
+
+
 
     {% endblock %}
 </body>

@@ -4,10 +4,22 @@
     <meta charset="utf-8">
     <title>Test de récupération des informations</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/graphiques.js') }}"></script>
   </head>
   <body>
+
+    {% extends 'base.html' %}
+
+
+    {% block content %}
+
+
+    {{ super() }}
+    <div class="container pt-5 mt-5">
     {% from "_macro_resultat_film.html" import afficher_resultat_films %}
        <!-- Ajout d'un bouton de retour -->
        <a class="nav-link" href="{{ url_for('recherche') }}"><i class="fas fa-home"></i> Retour</a>
@@ -17,7 +29,9 @@
         {{ afficher_resultat_films(films_titre_genre, type_data, word_data) }}
     {% endif %}
 
-
+    
+    {% endblock %}
+  </div>
     </body>
 
 </html>

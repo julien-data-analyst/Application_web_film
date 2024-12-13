@@ -2,7 +2,7 @@
 
 /* Création de la fonction récupérant les données nécessaires */
 
-async function donnees_films_par_genre() {
+ async function donnees_films_par_genre() {
     var response = await fetch("/api/data/films_par_genre"); /* Chercher les données JSON sur l'adresse correspondante */
     var data = await response.json(); /* Transformation en variable manipulable */
 
@@ -55,3 +55,7 @@ async function donnees_films_par_langue() {
 }
 
 donnees_films_par_langue()
+
+
+
+

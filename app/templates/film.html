@@ -9,10 +9,11 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Films</title>
 </head>
 <body id= 'diamond-background'class="transition-style" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2);">
     {% extends "base.html" %}
@@ -26,50 +27,147 @@
         <h1> Répartition des films selon les différents critères</h1>
          <h2>Nombre de films par genres</h2>
             <br>
-            <div><canvas id="myChart"></canvas></div>
+            <div><canvas id="myChart" height="700" width="700"></canvas></div>
             <br>
          <h2> Nombre de films pour les 20 langues les plus utilisées</h2>
             <br>
-            <div><canvas id="myChart2"></canvas></div>
+            <div><canvas id="myChart2" height="700" width="700"></canvas></div>
             <br>
          <h2> Nombre de films par année (limité au 20 dernières années)</h2>
          <br>
-         <div><canvas id="myChart3"></canvas></div>
+         <div><canvas id="myChart3" height="700" width="700"></canvas></div>
          <br>
-
+         <br>
+         <div> Le genre qui apparaît le plus dans les films {{ genre_max }}</div>
+         <div> L'année la plus productive : {{ annee_plus_prod }}</div> </div>
+     
+     
+        <div class="container mt-5 pt-5">
+     
+           <h1> Pour la page Réalisateur / Artiste </h1>
+           <p> {{ r_top_10_real_film }}</p>
+           <p> Pour accéder le directeur des films les mieux notés : {{ r_top_10_mieux_notes[0].directeur.nom }} {{ r_top_10_mieux_notes[0].directeur.prenom }}</p>
+           <p> Pour accéder le directeur des films les plus populaires : {{ r_top_10_plus_populaires[0].directeur.nom }} {{ r_top_10_plus_populaires[0].directeur.prenom }}</p>
         </div>
+     
+
+        
         <div class="container mt-5 pt-5">
             <h1>Statistiques financières</h1>
-                <h2>Les films les mieux notés</h2>
+                <h2>Total Budget</h2>
+
+                <ul>
+                    {% for i in total_budg_rec %}
+                        <li> {{ i }}</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
                 
-                <h2>Les films les plus votés </h2>
+                
+                <h2>Top 10 des films + rentables</h2>
+
+                <ul>
+                    {% for i in r_top_10_plus_rentable %}
+                        <li>{{ i[0].title }} {{ i[1] }} M $</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
                
-                <h2>Les films les plus populaires</h2>
+                <h2>Top 10 des films + deficit</h2>
+
+
+                <ul>
+                    {% for i in r_top_10_plus_deficit %}
+                        <li>{{ i[0].title }} {{ i[1] }} M $</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
         </div>
         <div class="container mt-5 pt-5">
             <h1>Statistiques sur les votes</h1>
                 <h2>Les films les mieux notés (selon la moyenne des votes).</h2>
-                
+
+                <ul>
+                    {% for i in r_top_10_mieux_notes %}
+                        <li>{{ i.title }} {{ i.vote_average }} </li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
+
                 <h2>Les films les plus votés (selon le nombre total de votes)</h2>
+
+
+                <ul>
+                    {% for i in r_top_10_plus_votes %}
+                        <li>{{ i.title }} {{ i.vote_count }}</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
                
                 <h2>Les films les plus populaires (selon l’indice de popularité)</h2>
+
+                <ul>
+                    {% for i in r_top_10_plus_populaires %}
+                        <li>{{ i.title }} {{ i.popularity }}</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
+
         </div>
         <div class="container mt-5 pt-5">
             <h1>Statistiques sur les durées</h1>
                 <h2>Les dix films les plus longs (en termes de durée)</h2>
+
+                <ul>
+                    {% for i in r_top_10_plus_long %}
+                        <li>{{ i.title }} {{ i.runtime }} m </li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
                 
                 <h2>Les dix films les plus courts</h2>
+
+
+                <ul>
+                    {% for i in r_top_10_plus_court %}
+                        <li>{{ i.title }} {{ i.runtime }} m</li>
+        
+        
+        
+                    {% endfor %}
+                </ul>
                
         </div>
         <div class="container mt-5 pt-5">
             <h1>Formulaire de recherche de films</h1>
+
+            <button type="button" id="add ">
+
+                <a href= "{{ url_for('recherche') }}">Accès recherche film</a>
+
+
+            </button>
+
                
                
         </div>
 
 
-
-
+    
 
 
 
