@@ -158,4 +158,10 @@
         padding: 10px 20px;
     }
   }
-  
+
+  .title_kpi {
+    color : #183682
+}
+  .kpi{
+    color :rgba(240, 13, 13, 0.738)
+  }

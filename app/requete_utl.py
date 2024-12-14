@@ -174,7 +174,9 @@ def films_par_genre():
     result_f_par_g = req_joint_par_crit(Genre, # Table en question 
                                         Genre.genre, # Colonne concernée
                                        film_genres, # Table d'association
-                                       film_genres.c.id_genres) # Colonne de la table d'association
+                                       film_genres.c.id_genres, # Colonne de la table d'association
+                                       add_filter=True,
+                                       filter=Genre.genre!="Missing") 
     
     # Mise en forme des résultats
     result_f_par_g = mise_forme_resultats_graph(result_f_par_g)
@@ -271,7 +273,9 @@ def max_films_genre():
                                         Genre.genre, # Colonne concernée
                                        film_genres, # Table d'association
                                        film_genres.c.id_genres, # Colonne de la table d'association
-                                       limit=1
+                                       limit=1,
+                                       add_filter=True,
+                                       filter=Genre.genre!="Missing"
                                        ) 
 
     return result_f_par_g[0]

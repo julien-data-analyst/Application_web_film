@@ -38,45 +38,50 @@
          <div><canvas id="myChart3" height="700" width="700"></canvas></div>
          <br>
          <br>
-         <div> Le genre qui apparaît le plus dans les films {{ genre_max }}</div>
-         <div> L'année la plus productive : {{ annee_plus_prod }}</div> </div>
+
+         <h2> Le genre qui apparaît le plus dans les films : </h2>
+            <h3 class="title_kpi">{{ genre_max[0] }}</h3>
+            <h4 class="kpi">{{ genre_max[1] }} films</h4>
+
+         <br />
+
+         <h2> L'année la plus productive : </h2> 
+         <h3 class = "title_kpi">{{ annee_plus_prod[0] }}</h3>
+         <h4 class="kpi">{{ annee_plus_prod[1] }} films</h4>
+        </div>
      
 
         
         <div class="container mt-5 pt-5">
             <h1>Statistiques financières</h1>
-                <h2>Total Budget</h2>
+                <h2>Total Budget/Recette</h2>
 
                 <ul>
-                    {% for i in total_budg_rec %}
-                        <li> {{ i }}</li>
-        
-        
-        
+                        <h4 class="kpi"><li> Budget total des films : {{ total_budg_rec[0] | int}} M $</li></h3>
+                        <h4 class="kpi"><li> Recettes totales des films : {{ total_budg_rec[1] | int}} M $</li></h3>
+                </ul>
+
+                <h2>Top 10 des films + chers</h2>
+
+                <ul>
+                    {% for i in r_top_10_plus_cher %}
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Titre : {{ i.title }} | Budget : {{ i.budget | int }} M $</li>
                     {% endfor %}
                 </ul>
-                
                 
                 <h2>Top 10 des films + rentables</h2>
 
                 <ul>
                     {% for i in r_top_10_plus_rentable %}
-                        <li>{{ i[0].title }} {{ i[1] }} M $</li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i[0].poster_path }}" alt="poster_{{i[0].title }}"> Titre : {{ i[0].title }} | Ratio revenue/budget : {{ i[1] | int }} M $</li>
                     {% endfor %}
                 </ul>
                
                 <h2>Top 10 des films + deficit</h2>
 
-
                 <ul>
                     {% for i in r_top_10_plus_deficit %}
-                        <li>{{ i[0].title }} {{ i[1] }} M $</li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i[0].poster_path }}" alt="poster_{{i[0].title }}"> Titre : {{ i[0].title }} | Déficit : {{ i[1] | int }} M $</li>
                     {% endfor %}
                 </ul>
         </div>
@@ -86,10 +91,7 @@
 
                 <ul>
                     {% for i in r_top_10_mieux_notes %}
-                        <li>{{ i.title }} {{ i.vote_average }} </li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Titre : {{ i.title }} | Note : {{ i.vote_average }} </li>
                     {% endfor %}
                 </ul>
 
@@ -98,10 +100,7 @@
 
                 <ul>
                     {% for i in r_top_10_plus_votes %}
-                        <li>{{ i.title }} {{ i.vote_count }}</li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Titre : {{ i.title }} | Nombre total de votes :  {{ i.vote_count }}</li>
                     {% endfor %}
                 </ul>
                
@@ -109,10 +108,7 @@
 
                 <ul>
                     {% for i in r_top_10_plus_populaires %}
-                        <li>{{ i.title }} {{ i.popularity }}</li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Titre : {{ i.title }} | Indice de popularité : {{ i.popularity | int }}</li>
                     {% endfor %}
                 </ul>
 
@@ -123,10 +119,7 @@
 
                 <ul>
                     {% for i in r_top_10_plus_long %}
-                        <li>{{ i.title }} {{ i.runtime }} m </li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> {{ i.title }} {{ i.runtime | conv_heure_min }} </li>
                     {% endfor %}
                 </ul>
                 
@@ -135,10 +128,7 @@
 
                 <ul>
                     {% for i in r_top_10_plus_court %}
-                        <li>{{ i.title }} {{ i.runtime }} m</li>
-        
-        
-        
+                        <li class="list-unstyled"> <img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> {{ i.title }} {{ i.runtime | int }} </li>
                     {% endfor %}
                 </ul>
                

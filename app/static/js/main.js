@@ -47,7 +47,13 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: chartLabel,
             data: valeurs,
-            borderWidth: 1
+            borderWidth: 1,
+            backgroundColor: [
+              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+              '#FF9F40', '#66FF66', '#FF66B2', '#6699FF', '#CCCC00',
+              '#FF9900', '#FF3300', '#33CC33', '#33CCCC', '#3366FF',
+              '#6600CC', '#9900FF', '#CC0066', '#00CCCC', '#0099CC'
+          ]
           }
         ]
       },

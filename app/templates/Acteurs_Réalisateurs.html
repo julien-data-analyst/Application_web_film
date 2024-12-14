@@ -20,33 +20,36 @@
     {{ super() }}    
     <div class="container  mt-5 pt-5">
         <h1>Statistiques globales</h1>
+        <h2> Top 10 des réalisateurs qui ont les films les mieux notés </h2>
         <ul>
 
             {% for i in r_top_10_mieux_notes %}
 
-            <li> {{ i.title }}  {{ i.vote_average }} {{ i.directeur.nom }} </li>
+            <li class="list-unstyled"><img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Réalisateur :  {% if i.directeur.nom != None %}{{ i.directeur.nom }}{% endif %} {{ i.directeur.prenom }} | Note : {{ i.vote_average }}  </li>
 
             {% endfor %}
 
 
         </ul>
 
+        <h2> Top 10 des réalisateurs qui ont les films les plus populaires </h2>
         <ul>
 
             {% for i in r_top_10_plus_populaires %}
 
-            <li> {{ i.title }}  {{ i.popularity }}</li>
+            <li class="list-unstyled"><img src="{{ i.poster_path }}" alt="poster_{{i.title }}"> Réalisateur : {% if i.directeur.nom != None %}{{ i.directeur.nom }}{% endif %} {{ i.directeur.prenom }}  | Indice de popularité : {{ i.popularity | int }}</li>
             
             {% endfor %}
 
 
         </ul>
 
+        <h2> Top 10 des réalisateurs qui ont fait le plus de films </h2>
         <ul>
 
             {% for i in r_top_10_real_film %}
 
-            <li> {{ i.nom }}  {{ i.prenom }}  {{ i[2] }}</li>
+            <li> Réalisateur : {{ i.nom }}  {{ i.prenom }} | Films réalisés : {{ i[2] }}</li>
             
             {% endfor %}
 

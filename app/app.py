@@ -60,7 +60,7 @@ def film():
                            )
 
 
-@app.route('/index',methods = ['GET', 'POST'])
+@app.route('/',methods = ['GET', 'POST'])
 def index():
     """
     Fonction : représente la page d'index où on présente le projet, l'environnement technique et l'équipe.
@@ -225,6 +225,30 @@ def extract_year(date_year):
 
 # Enregistrer le filtre
 app.jinja_env.filters['extract_year'] = extract_year
+
+def conversion_heure_min(minutes):
+    """
+    Fonction :  filtrage permettant les minutes en heures.
+    Retour : chaîne de caractère représentant l'heure et minute (00h00)
+    """
+
+    # Initialisation
+    minutes = int(minutes)
+    heure = 0
+
+    # Ajouter une heure si notre valeur dépasse les 60 minutes
+    while minutes >= 60:
+            minutes = minutes - 60
+            heure += 1
+
+    # Retourner la chaîne 
+    if minutes < 10:
+        return str(heure) + "h0" + str(minutes)
+    else:
+        return str(heure) + "h" + str(minutes)
+
+# Enregistrer le filtre
+app.jinja_env.filters['conv_heure_min'] = conversion_heure_min
 
 #############################
 # Partie insertion des données

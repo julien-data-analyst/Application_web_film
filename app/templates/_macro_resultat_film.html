@@ -22,6 +22,7 @@
 {% endif %}
      <ul>
      {% for film in films %}
+        <li class="list-unstyled"><img src="{{ film.poster_path }}" alt="poster_{{film.title }}"></li>
         <li>Titre du film : {{ film.title }}</li>
         <ul>
             <!-- Les informations du film concerné -->
@@ -32,7 +33,7 @@
             {% endif %}
             
             {% if type != "dir" %}
-                <li>Son réalisateur : {{ film.directeur.nom }} {{ film.directeur.prenom }}</li>
+                <li>Son réalisateur : {% if film.directeur.nom != None %}{{ film.directeur.nom }}{% endif %} {{ film.directeur.prenom }}</li>
             {% endif %}
             
             <!-- Parcourir tous ses acteurs -->
@@ -53,7 +54,7 @@
             
          
             
-            <li>Son année de sortie : {{ film.release_date | extract_year }}</li>
+            <li>Son année de sortie : {% if film.release_date == None %} Pas de date {% else %} {{ film.release_date | extract_year }} {% endif %}</li>
 
             <!-- Compléter pour langue d'origine-->
             <li>Sa langue originale : {{ film.language_org.language }}</li>
