@@ -24,7 +24,7 @@
 
             {% for i in r_top_10_mieux_notes %}
 
-            <li> {{ i.title }}  {{ i.vote_count }}</li>
+            <li> {{ i.title }}  {{ i.vote_average }} {{ i.directeur.nom }} </li>
 
             {% endfor %}
 
@@ -35,7 +35,7 @@
 
             {% for i in r_top_10_plus_populaires %}
 
-            <li> {{ i.title }}  {{ i.vote_count }}</li>
+            <li> {{ i.title }}  {{ i.popularity }}</li>
             
             {% endfor %}
 

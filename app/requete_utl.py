@@ -1,6 +1,6 @@
 #################################################
 # Auteurs : Julien RENOULT - Yop JUGUL DALYOP - Gabriel DURAND - Ryan DOBIGNY
-# Date : 08/12/2024
+# Date : 08/12/2024 - 14/12/2024
 # Sujet : requête SQL pour les visualisations graphiques + indicateurs + formulaire
 #################################################
 
@@ -17,14 +17,17 @@ db.init_app(app)
 def inf_film_10(col, cond, order_by="", calcule=False, limit=10):
     """
     Fonction : Récupérer des informations numériques (top 10) sur les Films (runtime, vote_count, budget, etc)
+
     Arguments :
     - col : colonne en question (objet Film) 
     - cond : condition à utiliser dans la requête (expression booléenne)
     - calcule : valeur booléenne s'il est calculé ou non (par défaut : "" donc croissant = 'col')
     - order_by : ordre croissant / décroissant (par défaut : croissant)
     - limit : nombre d'enregistrements à récupérer (par défaut : 10)
+
     Retour : 
     Résultat de la requête SQL (liste d'instance/de tuples)
+
     """
 
     if order_by=="" :
@@ -83,7 +86,7 @@ def mise_forme_resultats_graph(donnees, empl_mod = 0, empl_chiffre = 1):
 def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter=None, group_by=None,
                        limit=0, col_film=None, col_cal=None, order_by=None):
     """
-     Fonction : Permet de faire les différentes requêtes SQL nécessitant des jointures ou des opérations complexes
+     Fonction : Permet de faire les différentes requêtes SQL nécessitant des jointures et d'opérations complexes
      
      Arguments :
      - table : la table en question avec la relation * à * avec le Film
@@ -99,7 +102,6 @@ def req_joint_par_crit(table, col, jointure, col_table, add_filter=False, filter
      - col_cal : colonne calculée (utilisation de la fonction "func" de SQLAlchemy) (par défaut : func.count(col))
      - add_filter : valeur booléenne disant si on doit ajouter un filtre à notre requête SQL
      - filter : filtrage SQL à faire
-     ça peut concerner aussi une colonne numérique dans la table Film.
      
      Retour :
      Résultat de la requête SQL (Liste de tuples ou d'un tuple selon la limit)
@@ -193,7 +195,9 @@ def films_par_langue():
     result_f_par_l = req_joint_par_crit(
         Language, Language.language, 
         film_languages, film_languages.c.id_language,
-        limit=20
+        limit=20,
+        add_filter=True,
+        filter=Language.language != "Missing"
     )
 
     # Application de la mise en forme
@@ -207,6 +211,10 @@ def films_par_langue():
 # Nombre de films par année (20 dernières années)
 ###########################
 def films_par_annee():
+    """
+    Fonction : requête SQL pour récupérer le nombre de films par année et faire une mise en forme des résultats (20 dernières années)
+    Retour : Dictionnaire de liste ({"mod" : [...], "eff" : [...]})
+    """
 
     # Création de la variable d'année
     date_year = func.extract("year", Film.release_date)
@@ -231,12 +239,16 @@ def films_par_annee():
 ###########################
 
 def annee_plus_productive():
+    """
+    Fonction : requête SQL pour récupérer l'année la plus productive
+    Retour : tuple contenant l'année et son nombre de films associés
+    """
     # Création de la variable d'année
     date_year = func.extract("year", Film.release_date)
 
     # Requête pour trouver l'année la plus productive
     result_max_ann = req_joint_par_crit(
-        Film, date_year, False, "",
+        Film, date_year, False, "", # On met "" car il n'y a pas de jointures à faire
         group_by=date_year,
         add_filter=True,
         filter=date_year != None,
@@ -250,8 +262,8 @@ def annee_plus_productive():
 ############################
 def max_films_genre():
     """
-    Fonction : requête SQL pour récupérer le nombre de films par genre avec mise en forme des résultats
-    Retour : Dictionnaire de liste ({"mod" : [...], "eff" : [...]})
+    Fonction : requête SQL pour récupérer le genre
+    Retour : tuple contenant le genre et son nombre de films associés
     """
 
     # Application de la requête SQL
@@ -272,7 +284,10 @@ def max_films_genre():
 # Total des recettes et budgets cumulés ############
 ####################################################
 def total_budget_recette():
-
+    """
+    Fonction : requête SQL pour récupérer le total des budgets/recettes
+    Retour : tuple avec en premier le budget et en deuxième le revenue total rapporté par les films
+    """
     # Création des colonnes calculées
     somme_budget = func.sum(Film.budget)
     somme_revenue = func.sum(Film.revenue)
@@ -288,9 +303,12 @@ def total_budget_recette():
 # Liste des dix films les plus chères ############
 ####################################################
 def top_10_plus_cher():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films coûtant les plus chères
+    Retour : liste d'instance des Films les plus chères
+    """
     # Application de la requête SQL
-    result_f_plus_cher = inf_film_10(col=Film.budget, cond=Film.budget != None, order_by=Film.budget.desc())
+    result_f_plus_cher = inf_film_10(col=Film.budget, cond=Film.budget != 0, order_by=Film.budget.desc())
     
     return result_f_plus_cher
 
@@ -298,12 +316,15 @@ def top_10_plus_cher():
 # Liste des dix films les plus rentables ############
 ####################################################
 def top_10_plus_rentables():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les plus rentables
+    Retour : liste de tuple contenant pour chacun l'instance du film et son ratio de rentabilité
+    """
     # Création de la colonne calculée
     ratio = Film.revenue / Film.budget
 
     # Application de la requête SQL
-    result_f_plus_rent = inf_film_10(col=ratio, cond=ratio>=1, order_by=-ratio, calcule=True)
+    result_f_plus_rent = inf_film_10(col=ratio, cond=db.and_(Film.revenue > 0, Film.budget > 0), order_by=-ratio, calcule=True)
 
     return result_f_plus_rent
 
@@ -311,12 +332,15 @@ def top_10_plus_rentables():
 # Liste des dix films les plus déficitaire ############
 ####################################################
 def top_10_plus_deficit():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les plus déficitaires
+    Retour : liste de tuple contenant pour chacun l'instance du film et son déficit
+    """
     # Création de la colonne calculée
     deficit = Film.revenue - Film.budget
 
     # Application de la requête SQL
-    result_f_plus_def = inf_film_10(col=deficit, cond=deficit <= 0, calcule=True)
+    result_f_plus_def = inf_film_10(col=deficit, cond=db.and_(Film.revenue > 0, Film.budget > 0), calcule=True)
 
     return result_f_plus_def
 
@@ -328,7 +352,10 @@ def top_10_plus_deficit():
 # Les dix films les mieux notés (vote_average)
 # Pour récupérer le directeur : result_f_n[0].directeur
 def top_10_mieux_notes():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les mieux notés (vote average)
+    Retour : liste d'instance des Films les mieux notés
+    """
     # Application de la requête SQL
     result_f_n = inf_film_10(col=Film.vote_average, cond=Film.vote_average != None, 
                           order_by=Film.vote_average.desc())
@@ -337,7 +364,10 @@ def top_10_mieux_notes():
 
 # Les dix films les plus votés (vote_count)
 def top_10_plus_votes():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les plus votés (vote count)
+    Retour : liste d'instance des Films les plus votés
+    """
     # Application de la requête SQL
     result_f_c = inf_film_10(col=Film.vote_count, cond=Film.vote_count > 0, 
                           order_by=Film.vote_count.desc())
@@ -346,7 +376,10 @@ def top_10_plus_votes():
 
 # Les dix films les plus populaires (popularity)
 def top_10_plus_populaires():
-    
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les plus populaires (popularity)
+    Retour : liste d'instance des Films les plus populaires
+    """
     # Application de la requête SQL
     result_f_p =  inf_film_10(col=Film.popularity, cond=Film.popularity != None, 
                           order_by=Film.popularity.desc())
@@ -359,7 +392,10 @@ def top_10_plus_populaires():
 
 # Les dix films les plus longues
 def top_10_plus_long():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les mieux notés (vote average)
+    Retour : liste d'instance des Films les mieux votés
+    """
     # Application de la requête SQL
     result_f_plus_long = inf_film_10(col=Film.runtime, cond=Film.runtime != None, 
                           order_by=Film.runtime.desc())
@@ -368,7 +404,10 @@ def top_10_plus_long():
 
 # Les dix films les plus courtes
 def top_10_plus_court():
-
+    """
+    Fonction : requête SQL pour récupérer le top 10 des films les mieux notés (vote average)
+    Retour : liste d'instance des Films les mieux votés
+    """
     # Application de la requête SQL
     result_f_plus_court = inf_film_10(col=Film.runtime, cond=Film.runtime != None, 
                           order_by=Film.runtime)
@@ -380,6 +419,11 @@ def top_10_plus_court():
 ####################################################
 # Les 10 réalisateurs ayant réalisé le plus de films
 def top_10_realisateur():
+    """
+    Fonction : requête SQL pour récupérer le top 10 des réalisateurs qui ont réalisé le plus de films
+
+    Retour : liste de tuples contenant le nom, prénom et le nombre de films réalisés par le directeur
+    """
     # Création de la colonne calculé
     cpt_film = func.count(Film.id)
 
@@ -387,6 +431,7 @@ def top_10_realisateur():
     result_f_r = (
         db.session.query(Directeur.nom, Directeur.prenom, cpt_film)
         .join(Film, Directeur.id == Film.id_directeur) # Jointure avec la table Film
+        .filter(Directeur.prenom != "Missing") # Enlever ceux qui n'ont pas de directeur
         .group_by(Directeur.id) # Grouper par directeur
         .order_by(-cpt_film) # Ordre décroissant
         .limit(10)
@@ -405,12 +450,12 @@ def rech_films(nom, table, colonne):
     - colonne : colonne concernée
 
     Retour :
-    - une liste d'instance dont le nom correspond partiellement à celui demandé
+    - une liste d'instance dont la valeur recherchée est dans leur titre/genre/nom_directeur
     """
 
     # Application de la requête SQL
     colonne_order_by = Film.release_date
-    search = "{}%".format(nom) # Ce qui donne "%nom%"
+    search = "%{}%".format(nom) # Ce qui donne "%nom%"
 
     results = table.query
 
@@ -450,6 +495,7 @@ def rech_films(nom, table, colonne):
     
     return results
 
+# Partie test des requêtes
 if __name__=="__main__":
     with app.app_context() :
 
@@ -457,7 +503,7 @@ if __name__=="__main__":
         print("Le nombre de films par genre : \n"+str(films_par_genre()) + "\n")
         print("Le nombre de films par langue : \n"+str(films_par_langue()) + "\n")
         print("Le nombre de films par année : \n"+str(films_par_annee()) + "\n")
-        print("Le genre qui apparaît le plus : " + str(max_films_genre())) # Le premier de notre première requête
+        print("Le genre qui apparaît le plus : " + str(max_films_genre()))
         print("L'année la plus productive : " + str(annee_plus_productive())) # L'année la plus productive
 
         # Test pour la deuixème section
@@ -490,9 +536,6 @@ if __name__=="__main__":
         print("Les réalisateurs des 10 films les mieux notés : "+str(liste_real_not))
         print("Les réalisateurs des 10 films les plus populaires : "+str(liste_real_pop))
 
-        # Les réalisateurs qui ont comme nom Shy
+        # Les réalisateurs qui contient le nom "Shy"
         print("Les directeurs contenant le nom 'Shy' : " + str(rech_films("Shy", Directeur, Directeur.nom)))
         print("Les films réalisés avec le genre 'Drama' : " + str(rech_films("Drama", Film, Genre.genre)))
-        # Au niveau de la recherche des directeurs
-        #print("Les directeurs possédant le nom 'Dir' : " + str(rech_films("Dir5")))
-        #print("Le nombre de films du premier directeur dans la fonction de recherche : " + str(rech_real("Dir")[0].films.count()))

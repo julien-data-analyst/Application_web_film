@@ -7,28 +7,26 @@
 # Chargement des librairies
 import os
 from config import app
-from modele_bdd import db, Genre, Film, Directeur, Language, Company, Acteur, Collection, film_languages, film_genres, film_companies, film_acteurs
-
-# Toutes les tables et relations
-from requete_utl import inf_film_10, req_joint_par_crit, mise_forme_resultats_graph, \
-                        films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
+from modele_bdd import db, Genre, Film, Directeur
+# Toutes les requêtes SQL nécessaires
+from requete_utl import films_par_genre, films_par_annee, films_par_langue, top_10_mieux_notes, \
                         top_10_plus_cher, top_10_plus_court, top_10_plus_deficit, top_10_plus_long, top_10_plus_populaires, \
                         top_10_plus_rentables, top_10_plus_votes, total_budget_recette, annee_plus_productive, max_films_genre, \
                         top_10_realisateur, rech_films
-
-from formulaire_real import RealForm, TitGenForm
-from sqlalchemy.sql import insert
-import datetime
-from flask import render_template, jsonify, flash, redirect, url_for, session
+# Importation des formulaires
+from formulaires import RealForm, TitGenForm
+from flask import render_template, jsonify, flash, redirect, url_for
 import pandas as pd
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
 
-# Attention : se placer dans le dossier app pour tester le programme
-# Si base déjà créée : supprimer la base en question pour éviter le moindre problème dans la création de table si modif au niveau des colonnes/tables
+# Attention : se placer dans le dossier app pour lancer l'application
+# si base déjà créé et que vous voulez relancer la création et l'insertion de la BDD, supprimer le fichier BDD
 
 @app.route('/film', methods=["GET", "POST"])
 def film():
+    """
+    Fonction : représente la page de film où on va retrouver les différents indicateurs/visuels sur les films
+    Retour : page web contenant toutes les informations à propos des films
+    """
 
     # Application des différentes requêtes SQL pour récupérer les informations
 
@@ -46,7 +44,6 @@ def film():
     r_top_10_plus_court = top_10_plus_court()
     r_top_10_plus_deficit = top_10_plus_deficit()
     r_top_10_plus_rentable = top_10_plus_rentables()
-    r_top_10_real_film = top_10_realisateur()
 
     return render_template("film.html",
                            annee_plus_prod = annee_plus_prod,
@@ -59,28 +56,27 @@ def film():
                            r_top_10_plus_deficit = r_top_10_plus_deficit,
                            r_top_10_plus_votes = r_top_10_plus_votes,
                            r_top_10_plus_populaires = r_top_10_plus_populaires,
-                           r_top_10_plus_rentable = r_top_10_plus_rentable,
-                           r_top_10_real_film = r_top_10_real_film # [(nom_directeur, prenom_directeur, effectif)]
+                           r_top_10_plus_rentable = r_top_10_plus_rentable
                            )
 
 
-
-
 @app.route('/index',methods = ['GET', 'POST'])
-
 def index():
+    """
+    Fonction : représente la page d'index où on présente le projet, l'environnement technique et l'équipe.
+    Retour : page web sur la présentation du projet
+    """
     return render_template('index.html')
-
-
-
-
-
 
 #################################
 # Création de la page du formulaire pour la recherche de réalisateur
 #################################
 @app.route('/acteur_réa', methods=["GET", "POST"])
 def acteur_réa():
+    """
+    Fonction : représente la page des réalisateurs
+    Retour : page web contenant toutes les informations à propos des films
+    """
     # Pour le formulaire
     form = RealForm()
 
@@ -102,7 +98,7 @@ def acteur_réa():
             flash("Nous n'avons pas pu trouvé de réalisateurs correspondant à votre recherche")
 
             # Retour du formulaire sans la possibilité de renvoyer les données envoyées
-            return redirect(url_for('recherche_realisateur'))
+            return redirect(url_for('acteur_réa'))
 
         
     return render_template("Acteurs_Réalisateurs.html",
@@ -112,11 +108,16 @@ def acteur_réa():
                            r_top_10_plus_populaires = r_top_10_plus_populaires,
                            r_top_10_real_film = r_top_10_real_film)
 
+
 #################################
 # Création de la page du formulaire pour la recherche de films par genre/titre
 #################################
 @app.route('/rech_film', methods=["GET", "POST"])
 def recherche():
+    """
+    Fonction : représente le formulaire de recherche de film par genre/titre
+    Retour : page web contenant le formulaire en question
+    """
     form = TitGenForm()
     result = []
     type_data = ""
@@ -156,7 +157,14 @@ def recherche():
 # Création de la route pour afficher les films réalisés par le réalisateur/directeur
 @app.route("/films_realisateur/<id_dir>")
 def aff_film(id_dir):
+    """
+    Fonction : représente la page de résultat sur les films réalisés par un directeur
 
+    Argument :
+    - id_dir : id du directeur à rechercher
+
+    Retour : page web contenant tous les films réalisés par le directeur choisi (id_dir)
+    """
     # Recherche SQL sur les films réalisés par ce directeur
     resultat = Directeur.query.filter(Directeur.id == id_dir).first()
 
@@ -166,11 +174,16 @@ def aff_film(id_dir):
 ##################################
 # Création des routes spécifiques pour la Data 
 # JSON avec Fetch 
+# Commentaire : facilite la tâche pour la création de visuels graphiques avec ChartJS (main.js)
 ##################################
 
 # Pour le nombre de films par genre
 @app.route('/api/data/films_par_genre')
 def get_data_genre():
+    """
+    Fonction : permet d'avoir les données JSON concernant le nombre de films par genre
+    Retour : résultat JSON de la requête SQL
+    """
     result = films_par_genre()
 
     return jsonify(result)
@@ -178,6 +191,10 @@ def get_data_genre():
 # Pour le nombre de films par langue
 @app.route('/api/data/films_par_langue')
 def get_data_langue():
+    """
+    Fonction : permet d'avoir les données JSON concernant le nombre de films par langue (20 premières)
+    Retour : résultat JSON de la requête SQL
+    """
     result = films_par_langue()
 
     return jsonify(result)
@@ -185,6 +202,10 @@ def get_data_langue():
 # Pour le nombre de films par année
 @app.route('/api/data/films_par_annee')
 def get_data_annee():
+    """
+    Fonction : permet d'avoir les données JSON concernant le nombre de films par années (20 dernières années)
+    Retour : résultat JSON de la requête SQL
+    """
     result = films_par_annee()
 
     return jsonify(result)
@@ -193,6 +214,10 @@ def get_data_annee():
 # Création des filtrages personnalisés
 #####################################
 def extract_year(date_year):
+    """
+    Fonction : filtrage permettant de récupérer l'année d'une date au format (yyyy-mm-dd)
+    Retour : retourne l'année correspondante
+    """
     date_year = str(date_year)
     year = date_year.split("-")[0]
 
@@ -201,224 +226,19 @@ def extract_year(date_year):
 # Enregistrer le filtre
 app.jinja_env.filters['extract_year'] = extract_year
 
-#___________________________________________________________________ #
-#with app.app_context():
-#    db.drop_all()
-#    db.create_all()
+#############################
+# Partie insertion des données
+#############################
 
-#___________________________________________________________________ #
-# Chargement des données préparées.
-def run_notebook(notebook_path, timeout=600):
-    """
-    Executes a Jupyter notebook and returns its namespace.
-    
-    :param notebook_path: Path to the Jupyter notebook file.
-    :param timeout: Timeout in seconds for each cell execution.
-    :return: A dictionary containing the global variables and functions from the notebook.
-    """
-    # Load the notebook
-    with open(notebook_path, 'r', encoding='utf-8') as f:
-        notebook = nbformat.read(f, as_version=4)
-
-    # Configure the execution
-    ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
-
-    # Create a namespace to capture global variables/functions
-    namespace = {}
-
-    # Execute the notebook
-    try:
-        ep.preprocess(notebook, {'metadata': {'path': './'}})
-        # Extract all code cells and execute them in the namespace
-        for cell in notebook.cells:
-            if cell.cell_type == 'code':
-                exec(cell.source, namespace)
-    except Exception as e:
-        print(f"Error executing the notebook: {e}")
-
-    return namespace
-
+# Si base pas créé, il le crée avec ses insertions de données
 if not(os.path.exists("instance/films.db")):
-    namespace = run_notebook("./explo.ipynb")
 
-    with app.app_context():
-        #db.drop_all()
-        db.create_all()
+    # Importation des DataFrames préparés
+    import insertion as i_n
 
-    #_______________________ Access data __________________________________ #
-    dataset = namespace["dataset"]
-    genre = namespace["list_genre"]
-    collection = namespace["list_collection"]
-    languages = namespace["list_languages"]
-    production = namespace["list_production"]
-    actors = namespace["list_actors"]
-    director = namespace["list_directors"]
-    # --------------------------------------------------------------------- #
-
-    # Insert collection into the db
-    with app.app_context():
-        for index, row in collection.iterrows():
-            collection = Collection(name=row["belongs_to_collection"])
-            db.session.add(collection)
-        db.session.commit()
-        print("Collections data inserted successfully!")
-
-    # Insert actors into the db
-    with app.app_context():
-        for index, row in actors.iterrows():
-            actor = Acteur(
-                nom=row["lastname"], 
-                prenom=row["firstname"], 
-            )
-            db.session.add(actor)
-        db.session.commit()
-        print("Actors successfully added.")
+    # Pour plus de détails, voir le script dans insertion_new
+    i_n.creation_insertion_bdd(app, db)
 
 
-    # Insert directors into the db 
-    with app.app_context():
-        for index, row in director.iterrows():
-            director = Directeur(nom=row["lastname"], prenom=row["firstname"])
-            db.session.add(director)
-        db.session.commit()
-        print("Directors successfully added.")
-
-        
-    # Insert genres into the db
-    with app.app_context():
-        for index, row in genre.iterrows():
-            genss = Genre(genre = row["genres"])
-            db.session.add(genss)
-        db.session.commit()
-        print("Genre successfully added.")
-        
-    # Insert production companies
-    with app.app_context():
-        for index, row in production.iterrows():
-            companyss = Company(name = row["production_companies"])
-            db.session.add(companyss)
-        db.session.commit()
-        print("Companies added.") 
-        
-        
-    # Insert original languages
-    with app.app_context():
-        for index, row in languages.iterrows():
-            langss = Language(language = row["spoken_languages"])
-            db.session.add(langss)
-        db.session.commit()
-        print("Languages added.") 
-
-
-    # Insert into the table Film and the related associated tables
-    with app.app_context():
-        for index, row in dataset.iterrows():
-            # Ensure all critical film attributes are valid
-            orig_lang = Language.query.filter_by(language=row["original_language"]).first()
-            direc = Directeur.query.filter_by(nom=row["lastname"], prenom=row["firstname"]).first()
-            collec = Collection.query.filter_by(name=row["belongs_to_collection"]).first()
-
-            if not orig_lang or not direc or not collec:
-                continue
-            
-            # Initialize film object
-            film = Film()
-            
-            film.id = row["id"]
-            film.title = row["title"]
-            film.release_date = row["release_date"]
-            film.popularity = row["popularity"]
-            film.runtime = row["runtime"]
-            film.budget = row["budget_musd"] if not pd.isna(row["budget_musd"]) else 0
-            film.revenue = row["revenue_musd"] if not pd.isna(row["revenue_musd"]) else 0
-            film.tagline = row["tagline"] if not pd.isna(row["tagline"]) else None
-            film.overwiew = row["overview"] if not pd.isna(row["overview"]) else None
-            film.poster_path = row["poster"]
-            film.vote_count = row["vote_count"]
-            film.vote_average = row["vote_average"]
-            film.id_original_language = orig_lang.id
-            film.id_directeur = direc.id
-            film.id_collection = collec.id
-
-            # initialiser les clé étragères : film.fk = orig_lang.id    
-            db.session.add(film)
-            db.session.flush()
-            #print(f"Inserting data...")
-            
-            # Insert into association tables
-
-            # Genres
-            genres = row["genres"].split("|") if not pd.isna(row["genres"]) else []
-            for genre_name in genres:
-                genre = Genre.query.filter_by(genre=genre_name.strip()).first()
-                if not genre:
-                    genre = Genre(genre=genre_name.strip())
-                    db.session.add(genre)
-                    db.session.flush()  # Generate genre ID
-                db.session.execute(film_genres.insert().values(id_film=film.id, id_genres=genre.id))
-
-            # Companies
-            companies = row["production_companies"].split("|") if not pd.isna(row["production_companies"]) else []
-            for company_name in companies:
-                company = Company.query.filter_by(name=company_name.strip()).first()
-                if not company:
-                    company = Company(name=company_name.strip())
-                    db.session.add(company)
-                    db.session.flush()  # Generate company ID
-                db.session.execute(film_companies.insert().values(id_film=film.id, id_companies=company.id))
-
-            # Acteurs
-            acteurs_deja_inseres = []
-            acteurs = row["cast"].split("|") if not pd.isna(row["cast"]) else []
-            for acteur_name in acteurs :
-                
-                acteur_name = acteur_name.strip()
-
-                if "\xa0" in acteur_name:
-                    acteur_split = acteur_name.split("\xa0")
-                else:
-                    acteur_split = acteur_name.split(" ")
-
-                #print(film.id)
-                #print(acteur_split)
-                prenom_data = acteur_split[0]
-                nom_data = ""
-
-                if len(acteur_split) == 1:
-                    nom_data = None
-                elif len(acteur_split) == 2 and acteur_split[1] == "":
-                    nom_data = None
-                else :
-                    for elt in acteur_split[1:]:
-                        if nom_data == "":
-                            nom_data = elt
-                        else:
-                            nom_data = nom_data + " "+ elt
-
-                #print(nom_data)
-                acteur = Acteur.query.filter_by(prenom=prenom_data).filter_by(nom=nom_data).first()
-                
-                if not acteur:
-                    acteur = Acteur(nom=nom_data, prenom=prenom_data)
-                    db.session.add(acteur)
-                    db.session.flush()
-
-                # Dans le cas de doublons
-                if not((film.id, acteur.id) in acteurs_deja_inseres) :
-                    db.session.execute(film_acteurs.insert().values(id_film=film.id, id_acteur=acteur.id))
-                    acteurs_deja_inseres.append((film.id, acteur.id))
-
-            # Spoken Languages
-            spoken_languages = row["spoken_languages"].split("|") if not pd.isna(row["spoken_languages"]) else []
-            for lang in spoken_languages:
-                language = Language.query.filter_by(language=lang.strip()).first()
-                if not language:
-                    language = Language(language=lang.strip())
-                    db.session.add(language)
-                    db.session.flush()  # Generate language ID
-                db.session.execute(film_languages.insert().values(id_film=film.id, id_language=language.id))
-
-
-        db.session.commit()
-
+# Lancement de l'application
 app.run(debug=True)

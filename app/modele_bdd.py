@@ -36,13 +36,16 @@ class Film(db.Model):
     Pour les relations étrangères (* à 1)
     - id_directeur : clé étrangère montrant le réalisateur/directeur qui a fait le film
     - id_collection : clé étrangère montrant s'il fait partie ou non d'une collection
-    
+    - id_original_language : clé étrangère montrant sa langue originale (original language)
+
     Pour les relations étrangères (* à *)
     - genres : permet de voir les genres associés au film en question
     - companies : permet de voir les companies de productions associées au film en question
     - acteurs : permet de voir les acteurs associés au film en question
-    - langages : permet de voir les langues disponibles du film en question
+    - langages : permet de voir les langues disponibles du film en question (spoken languages)
+    
     """
+
     __tablename__ = "films"  # Table name in SQLite
 
     # Création des différentes colonnes
@@ -96,11 +99,15 @@ class Film(db.Model):
 ##############################
 class Directeur(db.Model):
     """
-    Création de la table Film dans la BDD.
+    Création de la table Directeur dans la BDD.
     Elle contient comme colonnes :
     - id : clé primaire permettant d'identifier la ligne en question
     - nom : nom du directeur
     - prenom : prénom du directeur
+
+    Pour les relations étrangères (1 à *) :
+    - directeurs : permet de voir tous les films associés au directeur/réalisateur
+
     """
 
     __tablename__ = "directeurs"
@@ -140,7 +147,10 @@ class Collection(db.Model):
     Création de la table Collection dans la BDD.
     Elle contient comme colonnes :
     - id : clé primaire permettant d'identifier la ligne en question
-    - name : nom de la collection 
+    - name : nom de la collection
+
+    Pour les relations étrangères (1 à *)
+    - films : permet de voir tous les films associés à une collection
     """
     __tablename__="collections"
     
@@ -184,6 +194,9 @@ class Language(db.Model):
     Elle contient comme colonnes :
     - id : clé primaire permettant d'identifier la ligne en question
     - langage : la langue en question
+
+    Pour les relations étrangères (1 à *)
+    - films_org : permet de savoir qui contient ce language en tant qu'original
     """
     __tablename__="languages"
     
