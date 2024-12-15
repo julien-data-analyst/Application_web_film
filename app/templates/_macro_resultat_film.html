@@ -65,7 +65,7 @@
                 <li>Sa note moyenne : {{ film.vote_average }}</li>
             {% endif %}
             
-            <li>L'indice de popularité de ce film : {{ film.popularity }}</li>
+            <li>L'indice de popularité de ce film : {{ "{:.2f}".format(film.popularity).replace(",", " ") }}</li> <!-- Format décimal arrondi à 2 chiffres -->
         </ul>
         <br />
      {% endfor %}

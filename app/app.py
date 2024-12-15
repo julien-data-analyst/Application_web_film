@@ -138,7 +138,10 @@ def recherche():
 
         if result == []:
             flash(mess_inf)
-            return redirect('formulaire_films.html')
+            return render_template("formulaire_films.html",
+                                   form = form,
+                                   films_titre_genre = result)
+        
         else :
             return render_template("resultat_recherche.html",
                         films_titre_genre = result,
