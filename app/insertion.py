@@ -4,17 +4,17 @@
 # Sujet : insertion des données dans le BDD après préparation
 #################################################
 
+# Chargement des librairies
 import pandas as pd
 import os
 from tqdm import tqdm
 import explo as ex
-import time 
 
 # Initialiser la BDD (si lancé ici)
 if __name__=="__main__":
     from config import app
     from modele_bdd import db
-
+    from sqlalchemy import insert
     db.init_app(app)
 
 def creation_insertion_bdd(inst_app, inst_db):
