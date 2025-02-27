@@ -1,5 +1,5 @@
 # Les fichiers à ignorer sur le dépôt distant
-envSAEOutil/
+envSAETest/
 Observation.ipynb
 nettoyage_preparation/
 app/templates/import_chartjs.html
