@@ -1,4 +1,5 @@
 # Les fichiers à ignorer sur le dépôt distant
 envSAEOutil/
+envSAE/
 Observation.ipynb
 nettoyage_preparation/
