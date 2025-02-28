@@ -1,6 +1,6 @@
 from flask.testing import FlaskClient
 from modele_bdd import Collection
-
+# crud and relation 
 def test_film_attributes(exemple_film):
     """Test that the Film instance has correct attributes."""
     assert exemple_film.title == "Wakfu le film"
