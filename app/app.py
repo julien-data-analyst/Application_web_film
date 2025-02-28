@@ -268,4 +268,5 @@ if not(os.path.exists("instance/films.db")):
 
 
 # Lancement de l'application
-app.run(debug=True)
+if __name__=="__main__":
+    app.run(debug=True)
