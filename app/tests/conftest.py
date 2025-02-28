@@ -63,11 +63,12 @@ def exemple_film():
         vote_count=50000,
         vote_average=4.253,
         id_directeur=1,
-        id_collection=2,
+        id_collection=1,
         id_original_language=3
     )
 
-    
+    return film
+
 @pytest.fixture
 def collection():
     """
