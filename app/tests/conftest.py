@@ -1,5 +1,5 @@
 #####################-
-# Auteur : Julien RENOULT
+# Auteur : # Auteurs : Gabriel DURAND - Ryan DOBIGNY - Julien RENOULT - Yop JUGUL DALYOP 
 # Promo : BUT SD3 
 # Sujet : Test d'application 
 # Création des fixtures
@@ -9,6 +9,7 @@ import pytest
 from app import app, db
 from modele_bdd import Film 
 import datetime
+from modele_bdd import Collection #import to instantiate the Collection
 
 @pytest.fixture
 def client():
@@ -67,3 +68,11 @@ def exemple_film():
     )
 
     
+@pytest.fixture
+def collection():
+    """
+    Fixture for collection. 
+    A collection has an id and a name.
+    """
+    collection = Collection(id=1, name="Test collection")
+    return collection
