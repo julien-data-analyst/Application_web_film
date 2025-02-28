@@ -9,7 +9,7 @@ import pytest
 from app import app, db
 from modele_bdd import Film 
 import datetime
-from modele_bdd import Collection #import to instantiate the Collection
+from modele_bdd import Collection ,Acteur , Directeur #import to instantiate the Collection
 
 @pytest.fixture
 def client():
@@ -77,3 +77,27 @@ def collection():
     """
     collection = Collection(id=1, name="Test collection")
     return collection
+
+
+
+
+
+@pytest.fixture
+def acteur():
+    """
+    Fixture for Acteur. 
+    A Acteur has an id and a name and a prenom.
+    """
+    acteur = Acteur(id=1, name="Todd",prenom ='Jean')
+    return  acteur 
+
+@pytest.fixture
+def directeur():
+    """
+    Fixture for Acteur. 
+    A Acteur has an id and a name and a prenom.
+    """
+    directeur = Directeur(id=1, name="Inthekitchen",prenom ='Bryan')
+    return  directeur 
+
+
