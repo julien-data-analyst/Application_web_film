@@ -11,6 +11,18 @@ from modele_bdd import Film
 import datetime
 from modele_bdd import Collection #import to instantiate the Collection
 
+
+
+@pytest.fixture
+def test_db():
+    """Provide a clean database session for each test without requiring app import."""
+    with app.app_context():  # Ensure we are in a Flask app context
+        db.create_all()  # Create tables in the test database
+        yield db  # Provide the db session to tests
+        db.session.remove()
+        db.drop_all()  # Clean up after tests
+
+
 @pytest.fixture
 def client():
      """
