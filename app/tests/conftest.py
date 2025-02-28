@@ -54,7 +54,6 @@ def client():
 
 @pytest.fixture
 def exemple_film():
-
     # Création d'une instance de film 
     film = Film(
         id=1,
