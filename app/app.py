@@ -257,16 +257,17 @@ app.jinja_env.filters['conv_heure_min'] = conversion_heure_min
 # Partie insertion des données
 #############################
 
-# Si base pas créé, il le crée avec ses insertions de données
-if not(os.path.exists("instance/films.db")):
-
-    # Importation des DataFrames préparés
-    import insertion as i_n
-
-    # Pour plus de détails, voir le script dans insertion_new
-    i_n.creation_insertion_bdd(app, db)
-
-
 # Lancement de l'application
 if __name__=="__main__":
+        # Si base pas créé, il le crée avec ses insertions de données
+    if not(os.path.exists("instance/films.db")):
+
+        # Importation des DataFrames préparés
+        import insertion as i_n
+
+        # Pour plus de détails, voir le script dans insertion_new
+        i_n.creation_insertion_bdd(app, db)
+        
     app.run(debug=True)
+
+
