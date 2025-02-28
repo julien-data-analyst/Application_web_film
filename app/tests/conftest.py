@@ -66,6 +66,7 @@ def exemple_film():
         id_collection=2,
         id_original_language=3
     )
+    return film
 
     
 @pytest.fixture
