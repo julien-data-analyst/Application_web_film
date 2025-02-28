@@ -10,8 +10,6 @@ from app import app, db
 from modele_bdd import Film 
 import datetime
 from modele_bdd import Collection ,Acteur , Directeur #import to instantiate the Collection
-<<<<<<< HEAD
-
 
 
 @pytest.fixture
@@ -23,8 +21,7 @@ def test_db():
         db.session.remove()
         db.drop_all()  # Clean up after tests
 
-=======
->>>>>>> e50153c69f29fb23b5382cccebfa05a17f4276d3
+
 
 @pytest.fixture
 def client():
