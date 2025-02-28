@@ -278,3 +278,4 @@ film_languages = db.Table(
     db.Column('id_language', db.Integer,
               db.ForeignKey('languages.id'), primary_key=True)
 )
+

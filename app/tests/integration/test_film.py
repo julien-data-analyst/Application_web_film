@@ -36,6 +36,6 @@ def test_crud_film(client, exemple_film):
     # Vérification que ça a bien été supprimé
     assert Film.query.filter_by(title=exemple_film.title).first() is None
 
-def test_relationship_film(client, exemple_film):
+#def test_relationship_film(client, exemple_film):
     
-    # Tester 
+#    # Tester 
