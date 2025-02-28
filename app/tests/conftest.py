@@ -11,6 +11,18 @@ import datetime
 from modele_bdd import Film, Language, Collection, \
     Acteur , Directeur, Company, Genre #import to instantiate the Collection
 
+
+@pytest.fixture
+def test_db():
+    """Provide a clean database session for each test without requiring app import."""
+    with app.app_context():  # Ensure we are in a Flask app context
+        db.create_all()  # Create tables in the test database
+        yield db  # Provide the db session to tests
+        db.session.remove()
+        db.drop_all()  # Clean up after tests
+
+
+
 @pytest.fixture
 def client():
      """
@@ -121,7 +133,7 @@ def acteur():
     Fixture for Acteur. 
     A Acteur has an id and a name and a prenom.
     """
-    acteur = Acteur(id=1, name="Todd",prenom ='Jean')
+    acteur = Acteur(id=1, nom="Todd",prenom ='Jean')
     return  acteur 
 
 @pytest.fixture
@@ -130,7 +142,7 @@ def directeur():
     Fixture for Acteur. 
     A Acteur has an id and a name and a prenom.
     """
-    directeur = Directeur(id=1, name="Inthekitchen",prenom ='Bryan')
+    directeur = Directeur(id=1, nom="Inthekitchen",prenom ='Bryan')
     return  directeur 
 
 
