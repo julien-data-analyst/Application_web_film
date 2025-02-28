@@ -7,9 +7,9 @@
 
 import pytest
 from app import app, db
-from modele_bdd import Film 
 import datetime
-from modele_bdd import Collection ,Acteur , Directeur #import to instantiate the Collection
+from modele_bdd import Film, Language, Collection, \
+    Acteur , Directeur, Company, Genre #import to instantiate the Collection
 
 @pytest.fixture
 def client():
@@ -42,7 +42,9 @@ def client():
 
 @pytest.fixture
 def exemple_film():
-
+    """
+    Fonction : permet de créer une instance de film
+    """
     # Création d'une instance de film 
     film = Film(
         id=1,
@@ -67,6 +69,38 @@ def exemple_film():
         id_original_language=3
     )
     return film
+
+@pytest.fixture 
+def exemple_langue():
+    """
+    Fonction : création d'une instance de langue
+    """
+    lang = Language(
+        id=3,
+        langage = "Français")
+    
+    return lang
+
+@pytest.fixture
+def exemple_genre():
+    """
+    Fonction : création d'une instance de genre
+    """
+    genre = Genre(
+        id=1,
+        genre="Action"
+    )
+
+@pytest.fixture
+def exemple_company():
+    """
+    Fonction : création d'une instance de Company
+    """
+
+    comp = Company(id=1,
+                   name="Ankama Animations")
+    
+    return comp
 
 @pytest.fixture
 def collection():
