@@ -88,7 +88,7 @@ def acteur():
     Fixture for Acteur. 
     A Acteur has an id and a name and a prenom.
     """
-    acteur = Acteur(id=1, name="Todd",prenom ='Jean')
+    acteur = Acteur(id=1, nom="Todd",prenom ='Jean')
     return  acteur 
 
 @pytest.fixture
@@ -97,7 +97,7 @@ def directeur():
     Fixture for Acteur. 
     A Acteur has an id and a name and a prenom.
     """
-    directeur = Directeur(id=1, name="Inthekitchen",prenom ='Bryan')
+    directeur = Directeur(id=1, nom="Inthekitchen",prenom ='Bryan')
     return  directeur 
 
 
