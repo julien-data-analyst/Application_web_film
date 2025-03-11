@@ -1,6 +1,6 @@
 #################################################
 # Auteurs : Julien RENOULT
-# Date : 28/02/2025
+# Date : 28/02/2025 - 11/03/2025
 # Sujet : test d'un outil décsionnel (film)
 #################################################
 
@@ -83,14 +83,30 @@ def test_relationship_film(client, exemple_film,
     db.session.commit()
 
     # Test des relations entre le film et les différentes tables
-    assert len(exemple_film.acteurs) > 0
-    assert exemple_film.acteurs[0].name == "Todd" and \
+
+    # Pour acteur
+    assert len(list(exemple_film.acteurs)) > 0
+    assert exemple_film.acteurs[0].nom == "Todd" and \
     exemple_film.acteurs[0].prenom == "Jean"
 
-    assert len(exemple_film.companies) > 0
+    # Pour companie
+    assert len(list(exemple_film.companies)) > 0
     assert exemple_film.companies[0].name == "Ankama Animations"
     
+    # Pour genre
+    assert len(list(exemple_film.genres)) > 0
+    assert exemple_film.genres[0].genre == "Action"
 
+    # Pour langue
+    assert len(list(exemple_film.languages)) > 0
+    assert exemple_film.languages[0].language == "Français"
+
+    # Pour directeur
+    assert exemple_film.directeur.nom == "Inthekitchen" and \
+    exemple_film.directeur.prenom == "Bryan"
+
+    # Pour collection
+    assert exemple_film.collection.name == "Test collection"    
 
 
 

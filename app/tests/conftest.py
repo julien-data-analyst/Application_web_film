@@ -89,7 +89,7 @@ def exemple_langue():
     """
     lang = Language(
         id=3,
-        langage = "Français")
+        language = "Français")
     
     return lang
 
@@ -103,6 +103,8 @@ def exemple_genre():
         genre="Action"
     )
 
+    return genre
+
 @pytest.fixture
 def exemple_company():
     """
@@ -115,6 +117,43 @@ def exemple_company():
     return comp
 
 @pytest.fixture
+def exemples_films():
+    """
+    Fonction : création de dix exemples de films
+    """
+
+    # Indication des noms de films
+    liste_nom_film = ["Wakfu le film", "Bonjour les amis !!!",
+                      "Les indestructibles", "Star Wars",
+                      "10 plus chers", "Age de glace 1",
+                      "Age de glace 2", "Age de glace 3",
+                      "Age de glace 4", "Shrek"]
+    
+    # Initialisation de la liste des instances de films
+    liste_instance_film = []
+
+    for ind in range(len(liste_nom_film)):
+        liste_instance_film.append(Film(
+        id=ind,
+        title=liste_nom_film[ind],
+        release_date=datetime.datetime(2012, 2, 14),
+        popularity=(1 * ind) / 10,
+        runtime=120,
+        budget=15.5 * ind,
+        revenue=30.5,
+        tagline="Quête des six dofus",
+        overwiew = """""",
+        poster_path="",
+        vote_count=50000,
+        vote_average=4.253,
+        id_directeur=1,
+        id_collection=1,
+        id_original_language=3))
+    
+    return liste_instance_film
+
+
+@pytest.fixture
 def collection():
     """
     Fixture for collection. 
@@ -122,8 +161,6 @@ def collection():
     """
     collection = Collection(id=1, name="Test collection")
     return collection
-
-
 
 
 
