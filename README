@@ -1,0 +1,9 @@
+# Date : 11/03/2025
+# Auteurs : Julien RENOULT - ...
+# Sujet : Test et développement d'un outil décisionnel
+# répartition des différentes tâches
+
+Pour lancer l'application web, veuillez exécuter le script app.py en se mettant dans le dossier app.
+Pour ce qui est des tests, veuillez lancer la commande pytest -v dans le dossier app.
+
+Dans la suite de ce fichier, chaque membre du projet va expliquer ce qu'il a fait dans les tests que nous avons développé.
