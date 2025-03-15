@@ -18,7 +18,7 @@ et le genre le plus répandue des films.
 
 
 
-Partie test Film (Durand Gabriel) :
+Partie test Acteur (Durand Gabriel) :
 J'ai mené les tests unitaires, intégrations et systèmes concernant les acteurs.
 Le test unitaire permet de tester la saisie des instances d'un acteur en vérifiant tous ses attributs.
 Les tests d'intégrations quant à eux testent les relations avec Film et Acteurs.
