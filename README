@@ -1,9 +1,17 @@
 # Date : 11/03/2025
-# Auteurs : Julien RENOULT - ...
+# Auteurs : Julien RENOULT - Yop DALYOP - Ryan DOBIGNY - Gabriel DURAND
 # Sujet : Test et développement d'un outil décisionnel
 # répartition des différentes tâches
 
 Pour lancer l'application web, veuillez exécuter le script app.py en se mettant dans le dossier app.
 Pour ce qui est des tests, veuillez lancer la commande pytest -v dans le dossier app.
 
-Dans la suite de ce fichier, chaque membre du projet va expliquer ce qu'il a fait dans les tests que nous avons développé.
+Dans la suite de ce fichier, chaque membre du projet va expliquer ce qu'il a fait dans les tests que nous avons développé.'
+
+
+Partie test Film (Julien RENOULT) :
+J'ai mené les tests unitaires, intégrations et systèmes concernant les Films.
+Le test unitaire permet de tester la saisie des instances d'un film en vérifiant tous ses attributs.
+Les tests d'intégrations quant à eux testent les opérations CRUD de la table Film mais aussi les relations avec les autres tables.
+Pour finir, les tests systèmes vont vérifier, en insérant 10 exemples des films, les top 10 les films les plus chers, les top 10 des films les plus rentables
+et le genre le plus répandue des films.
