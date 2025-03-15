@@ -15,3 +15,11 @@ Le test unitaire permet de tester la saisie des instances d'un film en vérifian
 Les tests d'intégrations quant à eux testent les opérations CRUD de la table Film mais aussi les relations avec les autres tables.
 Pour finir, les tests systèmes vont vérifier, en insérant 10 exemples des films, les top 10 les films les plus chers, les top 10 des films les plus rentables
 et le genre le plus répandue des films.
+
+
+
+Partie test Film (Durand Gabriel) :
+J'ai mené les tests unitaires, intégrations et systèmes concernant les acteurs.
+Le test unitaire permet de tester la saisie des instances d'un acteur en vérifiant tous ses attributs.
+Les tests d'intégrations quant à eux testent les relations avec Film et Acteurs.
+Pour finir, les tests systèmes vont vérifier, en insérant des acteurs dans la table si la liste s'actualise ou non.
