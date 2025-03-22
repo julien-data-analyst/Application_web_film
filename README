@@ -5,11 +5,11 @@
 
 Pour lancer l'application web, veuillez exécuter le script app.py en se mettant dans le dossier app.
 Pour ce qui est des tests, veuillez lancer la commande pytest -v dans le dossier app.
-
+Pour ce qui est du poster, Cela a été fait en groupe.
 Dans la suite de ce fichier, chaque membre du projet va expliquer ce qu'il a fait dans les tests que nous avons développé.'
 
 
-Partie test Film (Julien RENOULT) :
+# Partie test Film (Julien RENOULT) :
 J'ai mené les tests unitaires, intégrations et systèmes concernant les Films.
 Le test unitaire permet de tester la saisie des instances d'un film en vérifiant tous ses attributs.
 Les tests d'intégrations quant à eux testent les opérations CRUD de la table Film mais aussi les relations avec les autres tables.
@@ -18,7 +18,7 @@ et le genre le plus répandue des films.
 
 
 
-Partie test Acteur (Durand Gabriel) :
+# Partie test Acteur (Durand Gabriel) :
 J'ai mené les tests unitaires, intégrations et systèmes concernant les acteurs.
 Le test unitaire permet de tester la saisie des instances d'un acteur en vérifiant tous ses attributs.
 Les tests d'intégrations quant à eux testent les relations avec Film et Acteurs.
