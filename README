@@ -31,3 +31,13 @@ J'ai mené les tests unitaires, d'intégrations et systèmes portant sur DIRECTE
 - units : teste la saisie/création d'un "objet" DIRECTEUR avec ses attributs (nom, prenom, […])
 - integration : teste des opérations CRUD (dans une même fonction) et la relation DIRECTEUR-FILM
 - systeme : teste l'affichage de la page affichant les films d'une même personne (il y a aussi un ancien test sur l'obtention des film par langues ; entre guillemets après le changement de test pour se focaliser sur DIRECTEUR).
+
+
+# Partie test Collection et Film par genre (DALYOP Yop) :
+Je me suis occupée de la partie tests unitaires & intégration pour "Collection" ainsi que la partie test de système pour "Film par genre"
+- Le test unitaire vérifie les caratéristiques de l'objet Collection,
+- Les tests d'intégration vérifie les opérations CRUD, et
+- Le test système vérifie le bon affichage du film cherché par genre.
+
+
+
